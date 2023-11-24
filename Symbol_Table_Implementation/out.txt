@@ -1,8 +1,18 @@
-	Scopetable# 1 created
-	Inserted  at position <7,1> of ScopeTable# 1
-	Inserted  at position <1,1> of ScopeTable# 1
-	Inserted  at position <5,1> of ScopeTable# 1
-	Scopetable# 1
+	ScopeTable# 1 created
+Cmd 1: I foo FUNCTION
+	Inserted  at position <7, 1> of ScopeTable# 1
+Cmd 2: I i VAR
+	Inserted  at position <1, 1> of ScopeTable# 1
+Cmd 3: L i
+	'i' found at position <1, 1> of ScopeTable# 1
+Cmd 4: L i j
+	Wrong number of arugments for the command L
+Cmd 5: L j
+	'j' not found in any of the ScopeTables
+Cmd 6: I 23 NUMBER
+	Inserted  at position <5, 1> of ScopeTable# 1
+Cmd 7: P C
+	ScopeTable# 1
 	1 --> (i,VAR)
 	2
 	3
@@ -10,9 +20,12 @@
 	5 --> (23,NUMBER)
 	6
 	7 --> (foo,FUNCTION)
-	Deleted 'i' from position <1,1> of ScopeTable# 1
+Cmd 8: D i
+	Deleted 'i' from position <1, 1> of ScopeTable# 1
+Cmd 9: D j
 	Not found in the current ScopeTable# 1
-	Scopetable# 1
+Cmd 10: P A
+	ScopeTable# 1
 	1
 	2
 	3
@@ -20,10 +33,14 @@
 	5 --> (23,NUMBER)
 	6
 	7 --> (foo,FUNCTION)
-	Scopetable# 1.1 created
-	Inserted  at position <7,1> of ScopeTable# 1.1
-	Inserted  at position <2,1> of ScopeTable# 1.1
-	Scopetable# 1.1
+Cmd 11: S
+	ScopeTable# 1.1 created
+Cmd 12: I <= RELOP
+	Inserted  at position <7, 1> of ScopeTable# 1.1
+Cmd 13: I == RELOP
+	Inserted  at position <2, 1> of ScopeTable# 1.1
+Cmd 14: P A
+	ScopeTable# 1.1
 	1
 	2 --> (==,RELOP)
 	3
@@ -31,7 +48,7 @@
 	5
 	6
 	7 --> (<=,RELOP)
-	Scopetable# 1
+	ScopeTable# 1
 	1
 	2
 	3
@@ -39,8 +56,10 @@
 	5 --> (23,NUMBER)
 	6
 	7 --> (foo,FUNCTION)
-	Inserted  at position <4,1> of ScopeTable# 1.1
-	Scopetable# 1.1
+Cmd 15: I >= RELOP
+	Inserted  at position <4, 1> of ScopeTable# 1.1
+Cmd 16: P C
+	ScopeTable# 1.1
 	1
 	2 --> (==,RELOP)
 	3
@@ -48,11 +67,18 @@
 	5
 	6
 	7 --> (<=,RELOP)
+Cmd 17: I <= RELOP
 	'<=' already exists in the current ScopeTable# 1.1
-	Inserted  at position <7,2> of ScopeTable# 1.1
-	Deleted 'i' from position <2,1> of ScopeTable# 1.1
+Cmd 18: I foo FUNCTION
+	Inserted  at position <7, 2> of ScopeTable# 1.1
+Cmd 19: D ==
+	Deleted '==' from position <2, 1> of ScopeTable# 1.1
+Cmd 20: D 23
 	Not found in the current ScopeTable# 1.1
-	Scopetable# 1.1
+Cmd 21: D
+	Wrong number of arugments for the command D
+Cmd 22: P A
+	ScopeTable# 1.1
 	1
 	2
 	3
@@ -60,7 +86,7 @@
 	5
 	6
 	7 --> (<=,RELOP) --> (foo,FUNCTION)
-	Scopetable# 1
+	ScopeTable# 1
 	1
 	2
 	3
@@ -68,10 +94,16 @@
 	5 --> (23,NUMBER)
 	6
 	7 --> (foo,FUNCTION)
-	Scopetable# 1.1.1 created
-	Inserted  at position <2,1> of ScopeTable# 1.1.1
-	Inserted  at position <3,1> of ScopeTable# 1.1.1
-	Scopetable# 1.1.1
+Cmd 23: L 23
+	'23' found at position <5, 1> of ScopeTable# 1
+Cmd 24: S
+	ScopeTable# 1.1.1 created
+Cmd 25: I x VAR
+	Inserted  at position <2, 1> of ScopeTable# 1.1.1
+Cmd 26: I y VAR
+	Inserted  at position <3, 1> of ScopeTable# 1.1.1
+Cmd 27: P A
+	ScopeTable# 1.1.1
 	1
 	2 --> (x,VAR)
 	3 --> (y,VAR)
@@ -79,7 +111,7 @@
 	5
 	6
 	7
-	Scopetable# 1.1
+	ScopeTable# 1.1
 	1
 	2
 	3
@@ -87,7 +119,7 @@
 	5
 	6
 	7 --> (<=,RELOP) --> (foo,FUNCTION)
-	Scopetable# 1
+	ScopeTable# 1
 	1
 	2
 	3
@@ -95,11 +127,20 @@
 	5 --> (23,NUMBER)
 	6
 	7 --> (foo,FUNCTION)
-	Scopetable# 1.1.1 deleted
-	Inserted  at position <7,3> of ScopeTable# 1.1
-	Scopetable# 1.1.2 created
-	Inserted  at position <5,1> of ScopeTable# 1.1.2
-	Scopetable# 1.1.2
+Cmd 28: L foo
+	'foo' found at position <7, 2> of ScopeTable# 1.1
+Cmd 29: E
+	ScopeTable# 1.1.1 deleted
+Cmd 30: I num VAR
+	Inserted  at position <7, 3> of ScopeTable# 1.1
+Cmd 31: S
+	ScopeTable# 1.1.2 created
+Cmd 32: I true BOOL
+	Inserted  at position <5, 1> of ScopeTable# 1.1.2
+Cmd 33: I a
+	Wrong number of arugments for the command I
+Cmd 34: P A
+	ScopeTable# 1.1.2
 	1
 	2
 	3
@@ -107,7 +148,7 @@
 	5 --> (true,BOOL)
 	6
 	7
-	Scopetable# 1.1
+	ScopeTable# 1.1
 	1
 	2
 	3
@@ -115,7 +156,7 @@
 	5
 	6
 	7 --> (<=,RELOP) --> (foo,FUNCTION) --> (num,VAR)
-	Scopetable# 1
+	ScopeTable# 1
 	1
 	2
 	3
@@ -123,19 +164,16 @@
 	5 --> (23,NUMBER)
 	6
 	7 --> (foo,FUNCTION)
-	Scopetable# 1.1.2 deleted
-	Scopetable# 1.1 deleted
+Cmd 35: E
+	ScopeTable# 1.1.2 deleted
+Cmd 36: E
+	ScopeTable# 1.1 deleted
+Cmd 37: E
 	ScopeTable# 1 cannot be deleted
-	Scopetable# 1
-	1
-	2
-	3
-	4
-	5 --> (23,NUMBER)
-	6
-	7 --> (foo,FUNCTION)
-	Scopetable# 1.2 created
-	Scopetable# 1.2
+Cmd 38: S
+	ScopeTable# 1.2 created
+Cmd 39: P A
+	ScopeTable# 1.2
 	1
 	2
 	3
@@ -143,7 +181,7 @@
 	5
 	6
 	7
-	Scopetable# 1
+	ScopeTable# 1
 	1
 	2
 	3
@@ -151,5 +189,8 @@
 	5 --> (23,NUMBER)
 	6
 	7 --> (foo,FUNCTION)
-	Scopetable# 1.2 deleted
-	Scopetable# 1 deleted
+Cmd 40: P Z
+	Invalid argument for the command P
+Cmd 41: Q
+	ScopeTable# 1.2 deleted
+	ScopeTable# 1 deleted
