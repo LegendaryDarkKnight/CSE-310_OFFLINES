@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <ostream>
 #include <sstream>
 using namespace std;
 
@@ -10,15 +11,8 @@ class SymbolInfo
     SymbolInfo *next;
 
 public:
-    SymbolInfo(string name, string type, SymbolInfo *next = nullptr)
-    {
-        this->name = name;
-        this->type = type;
-        this->next = next;
-    }
-    ~SymbolInfo()
-    {
-    }
+    SymbolInfo(string name, string type, SymbolInfo *next = nullptr) : name(name), type(type), next(next) {}
+    ~SymbolInfo() {}
     void setName(string name) { this->name = name; }
     string getName() { return name; }
     void setType(string type) { this->type = type; }
@@ -36,14 +30,12 @@ class ScopeTable
     int childCount;
 
 public:
-    ScopeTable(int n, ScopeTable *parent = nullptr)
+    ScopeTable(int n, ScopeTable *parent = nullptr) : total_buckets(n), parentScope(parent)
     {
-        total_buckets = n;
         hashTable = new SymbolInfo *[total_buckets];
         for (int i = 0; i < total_buckets; i++)
             hashTable[i] = nullptr;
         childCount = 0;
-        parentScope = parent;
         if (parentScope != nullptr)
         {
             parentScope->increaseChild();
@@ -56,17 +48,26 @@ public:
     ~ScopeTable()
     {
         for (int i = 0; i < total_buckets; i++)
-            if (hashTable[i])
-                delete hashTable[i];
-        delete hashTable;
+            // if (hashTable[i])
+            {
+                SymbolInfo *iter = hashTable[i];
+                while (iter != nullptr)
+                {
+                    SymbolInfo *temp = iter;
+                    iter = iter->getNext();
+                    delete temp;
+                }
+            }
+        delete []hashTable;
         cout << "\tScopeTable# " << id << " deleted\n";
     }
     unsigned long long hashSdbm(string str)
     {
         unsigned long long hash = 0;
-        int i = 0;
-        while (i < str.size())
-            hash = (unsigned long long)str[i++] + (hash << 6) + (hash << 16) - hash;
+        // int i = 0;
+        //while (i < str.size())
+        for(int i=0; i<str.size(); i++)
+            hash = str[i] + (hash << 6) + (hash << 16) - hash;
         return hash;
     }
     void increaseChild() { childCount++; }
@@ -89,12 +90,21 @@ public:
             cout << "\tInserted  at position <" << hash + 1 << ", 1> of ScopeTable# " << id << endl;
             return true;
         }
-        if (Lookup(name, false) != nullptr)
-        {
-            cout << "\t\'" << name << "\' already exists in the current ScopeTable# " << id << endl;
-            return false;
-        }
         SymbolInfo *iter = hashTable[hash];
+        while(iter!=nullptr){
+            if(iter->getName() == name)
+            {
+                cout << "\t\'" << name << "\' already exists in the current ScopeTable# " << id << endl;
+                return false;
+            }
+            iter = iter->getNext();
+        }
+        // if (Lookup(name, false) != nullptr)
+        // {
+        //     cout << "\t\'" << name << "\' already exists in the current ScopeTable# " << id << endl;
+        //     return false;
+        // }
+        iter = hashTable[hash];
         int pos = 2;
         while (iter->getNext())
         {
@@ -121,8 +131,6 @@ public:
             pos++;
             iter = iter->getNext();
         }
-        if (show)
-            cout << "\t\'" << name << "\' not found in any of the ScopeTables" << endl;
         return iter;
     }
     bool Delete(string name)
@@ -139,7 +147,7 @@ public:
         {
             hashTable[hash] = iter->getNext();
             delete iter;
-            cout << "\tDeleted \'"<<name<<"\' from position <" << hash + 1 << ", " << pos << "> of ScopeTable# " << id << endl;
+            cout << "\tDeleted '" << name << "' from position <" << hash + 1 << ", " << pos << "> of ScopeTable# " << id << endl;
             return true;
         }
         while (iter->getNext() != nullptr)
@@ -150,7 +158,7 @@ public:
                 SymbolInfo *temp = iter->getNext();
                 iter->setNext(temp->getNext());
                 delete temp;
-                cout << "\tDeleted \'i\' from position <" << hash + 1 << ", " << pos << "> of ScopeTable# " << id << endl;
+                cout << "\tDeleted '"<<name<<"' from position <" << hash + 1 << ", " << pos << "> of ScopeTable# " << id << endl;
                 return true;
             }
             iter = iter->getNext();
@@ -181,11 +189,7 @@ class SymbolTable
     int n;
 
 public:
-    SymbolTable(int n)
-    {
-        this->n = n;
-        current = new ScopeTable(n);
-    }
+    SymbolTable(int n) : n(n) { current = new ScopeTable(n); }
     ~SymbolTable()
     {
         ScopeTable *iter = current, *temp;
@@ -249,15 +253,15 @@ public:
 
 int main()
 {
-    freopen("out.txt", "w", stdout);
-    ifstream file("input.txt"); // Replace "example.txt" with your file name
+    ifstream file("input.txt");
+    FILE *fpt = freopen("output.txt", "w", stdout);
     if (!file.is_open())
     {
         cerr << "Unable to open the file!" << endl;
         return 1;
     }
     string line;
-     getline(file,line);
+    getline(file, line);
     int n = stoi(line);
     int j = 0;
     bool trash;
@@ -273,7 +277,7 @@ int main()
         while (iss >> token)
         {
             array[i++] = token;
-            cout<< " " << token ;
+            cout << " " << token;
         }
         cout << endl;
         switch (array[0][0])
@@ -310,7 +314,7 @@ int main()
                 else if (array[1] == "C")
                     symboltable->printCurrent();
                 else
-                    cout << "\tInvalid argument for the command P"<<endl;
+                    cout << "\tInvalid argument for the command P" << endl;
             }
             break;
         case 'S':
@@ -328,6 +332,7 @@ int main()
             /* code */
             break;
         case 'Q':
+            delete symboltable;
             break;
         default:
             cout << "\tInvalid Input\n";
@@ -335,57 +340,6 @@ int main()
         }
     }
     file.close();
-    delete symboltable;
+    fclose(fpt);
     return 0;
-    // ScopeTable *scopeTable = new ScopeTable(7);
-    // scopeTable->Insert("foo","FUNCTION");
-    // // cout<<"dsd\n";
-    // scopeTable->Insert("i","VAR");
-    // // cout<<"dsd\n";
-    // // cout<<scopeTable->Lookup("i")->getName();
-    // // cout<<"dsd\n";
-    // cout<<(scopeTable->Lookup("j") == nullptr)<<endl;
-    // // cout<<"dsd\n";
-    // scopeTable->Insert("23","NUMBER");
-    // scopeTable->print();
-    // scopeTable->Delete("i");
-    // scopeTable->print();
-
-    // SymbolTable *symboltable = new SymbolTable(7);
-    // symboltable->Insert("foo","FUNCTION");
-    // symboltable->Insert("i","VAR");
-    // symboltable->Lookup("i");
-    // symboltable->Lookup("j");
-    // symboltable->Insert("23","NUMBER");
-    // symboltable->printCurrent();
-    // symboltable->Remove("i");
-    // symboltable->Remove("j");
-    // symboltable->printAll();
-    // symboltable->EnterScope();
-    // symboltable->Insert("<=","RELOP");
-    // symboltable->Insert("==","RELOP");
-    // symboltable->printAll();
-    // symboltable->Insert(">=","RELOP");
-    // symboltable->printCurrent();
-    // symboltable->Insert("<=","RELOP");
-    // symboltable->Insert("foo","FUNCTION");
-    // symboltable->Remove("==");
-    // symboltable->Remove("23");
-    // symboltable->printAll();
-    // symboltable->EnterScope();
-    // symboltable->Insert("x","VAR");
-    // symboltable->Insert("y","VAR");
-    // symboltable->printAll();
-    // symboltable->ExitScope();
-    // symboltable->Insert("num","VAR");
-    // symboltable->EnterScope();
-    // symboltable->Insert("true", "BOOL");
-    // symboltable->printAll();
-    // symboltable->ExitScope();
-    // symboltable->ExitScope();
-    // symboltable->ExitScope();
-    // symboltable->printCurrent();
-    // symboltable->EnterScope();
-    // symboltable->printAll();
-    // delete symboltable;
 }
