@@ -39,7 +39,7 @@ int main()
             i++;
         }
         cout << "Cmd " << ++j << ": ";
-        cout << line<<endl;
+        cout << line << endl;
         switch (command[0])
         {
         case 'I':
@@ -92,13 +92,16 @@ int main()
             /* code */
             break;
         case 'Q':
+            if (i != 1)
+                cout << "\tWrong number of arguments for the command Q" << endl;
+            else
+                delete symboltable;
             break;
         default:
             cout << "\tInvalid Input\n";
             break;
         }
     }
-    delete symboltable;
     fclose(fpt);
     file.close();
     return 0;

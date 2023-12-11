@@ -6,7 +6,7 @@ Cmd 2: I i VAR
 Cmd 3: L i
 	'i' found at position <1, 1> of ScopeTable# 1
 Cmd 4: L i j
-	Wrong number of arugments for the command L
+	Wrong number of arguments for the command L
 Cmd 5: L j
 	'j' not found in any of the ScopeTables
 Cmd 6: I 23 NUMBER
@@ -76,7 +76,7 @@ Cmd 19: D ==
 Cmd 20: D 23
 	Not found in the current ScopeTable# 1.1
 Cmd 21: D
-	Wrong number of arugments for the command D
+	Wrong number of arguments for the command D
 Cmd 22: P A
 	ScopeTable# 1.1
 	1
@@ -138,7 +138,7 @@ Cmd 31: S
 Cmd 32: I true BOOL
 	Inserted  at position <5, 1> of ScopeTable# 1.1.2
 Cmd 33: I a
-	Wrong number of arugments for the command I
+	Wrong number of arguments for the command I
 Cmd 34: P A
 	ScopeTable# 1.1.2
 	1

@@ -2,3 +2,5 @@
 *.exe
 *.o
 valgrind-out.txt
+2005033
+flex
