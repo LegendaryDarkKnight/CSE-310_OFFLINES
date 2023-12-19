@@ -4,3 +4,10 @@
 valgrind-out.txt
 2005033
 flex
+*.out
+test.l
+test.txt
+FLEX MATERIAL
+a.cpp
+yrs.txt*
+test.cpp

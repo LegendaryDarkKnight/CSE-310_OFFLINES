@@ -2,8 +2,8 @@
 
 int main()
 {
-    ifstream file("input.txt");
-    FILE *fpt = freopen("output.txt", "w", stdout);
+    ifstream file("input1.txt");
+    FILE *fpt = freopen("output1.txt", "w", stdout);
     if (!file.is_open())
     {
         cerr << "Unable to open the file!" << endl;
@@ -36,6 +36,10 @@ int main()
         if (iss >> token)
         {
             arg2 = token;
+            i++;
+        }
+        while (iss >> token)
+        {
             i++;
         }
         cout << "Cmd " << ++j << ": ";
