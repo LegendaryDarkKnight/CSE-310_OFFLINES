@@ -355,8 +355,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 60
-#define YY_END_OF_BUFFER 61
+#define YY_NUM_RULES 61
+#define YY_END_OF_BUFFER 62
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -364,45 +364,45 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[173] =
+static const flex_int16_t yy_accept[181] =
     {   0,
-        2,    2,    0,    0,    0,    0,    0,    0,   61,   59,
-        2,    1,    2,   36,   45,   31,   33,   60,   37,   38,
-       30,   43,   30,   59,   31,   20,   44,   34,   35,   34,
-       19,   19,   41,   42,   33,   19,   19,   19,   19,   19,
-       19,   19,   19,   19,   19,   19,   39,   33,   40,   54,
-       53,   54,   54,   48,   47,   60,   47,   48,   58,   60,
-       58,    2,    1,   34,   32,   27,   27,    0,   26,    0,
-       29,   22,   21,   23,   51,   55,    0,   20,    0,   23,
-       33,   19,   23,   23,   19,   19,   19,   19,   19,   19,
-        7,   19,   19,   19,    3,   19,   19,   19,   19,   19,
+        2,    2,    0,    0,   46,   46,    0,    0,   62,   60,
+        2,    1,    2,   34,   45,   29,   31,   60,   35,   36,
+       28,   41,   28,   60,   29,   19,   42,   32,   33,   32,
+       43,   39,   40,   31,   43,   43,   43,   43,   43,   43,
+       43,   43,   43,   43,   37,   31,   38,   55,   54,   55,
+       55,   47,   46,   61,   46,   51,   61,   59,   61,   59,
+        2,    1,   32,   30,   25,   25,    0,   24,    0,   27,
+       21,   20,   52,   56,    0,   19,   44,   44,   31,   43,
+       43,   43,   43,   43,   43,    7,   43,   43,   43,    3,
+       43,   43,   43,   43,   43,   54,   53,   49,    0,   51,
 
-       53,   52,   50,    0,   46,   47,   47,   49,    0,   56,
-        0,   57,    0,    0,   25,    0,   27,   22,    0,   23,
-       23,    0,   24,   21,   21,   23,   19,   19,   19,   19,
-       19,   19,   19,   19,    5,    9,   19,   19,   19,   19,
-       28,    0,   22,   19,   16,   10,   19,   19,   19,    4,
-       19,   19,   19,   13,   19,    8,   19,   19,   19,   11,
-       19,   19,    6,   19,   19,   12,   14,   15,   19,   17,
-       18,    0
+       46,   46,   48,    0,   47,   50,   57,    0,   58,    0,
+        0,   23,    0,   25,   21,   44,   20,   44,    0,   22,
+       20,   43,   43,   43,   43,   43,   43,   43,   43,    5,
+        9,   43,   43,   43,   43,   26,    0,    0,   22,   20,
+       44,   20,   22,   44,   43,   16,   10,   43,   43,   43,
+        4,   43,   43,   43,   13,   43,    0,   21,   20,   22,
+        0,   20,    8,   43,   43,   43,   11,   43,   43,    6,
+       20,   43,   43,   12,   14,   15,   43,   17,   18,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
-        2,    2,    4,    1,    1,    1,    1,    1,    1,    1,
+        4,    4,    5,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    5,    6,    7,    1,    1,    8,    9,   10,   11,
-       12,   13,   14,   15,   16,   17,   18,   19,   19,   19,
-       19,   19,   19,   19,   19,   19,   19,    1,   20,   21,
-       22,   23,    1,    1,   24,   24,   24,   24,   25,   24,
-       24,   24,   24,   24,   24,   24,   24,   24,   24,   24,
-       24,   24,   24,   24,   24,   24,   24,   24,   24,   24,
-       26,   27,   28,   29,   30,    1,   31,   32,   33,   34,
+        1,    6,    7,    8,    1,    1,    9,   10,   11,   12,
+       13,   14,   15,   16,   17,   18,   19,   20,   21,   21,
+       21,   21,   21,   21,   21,   21,   21,    1,   22,   23,
+       24,   25,    1,    1,   26,   26,   26,   26,   27,   26,
+       26,   26,   26,   26,   26,   26,   26,   26,   26,   26,
+       26,   26,   26,   26,   26,   26,   26,   26,   26,   26,
+       28,   29,   30,   31,   32,    1,   33,   34,   35,   36,
 
-       35,   36,   24,   37,   38,   24,   39,   40,   24,   41,
-       42,   24,   24,   43,   44,   45,   46,   47,   48,   24,
-       24,   24,   49,   50,   51,    1,    1,    1,    1,    1,
+       37,   38,   26,   39,   40,   26,   41,   42,   26,   43,
+       44,   26,   26,   45,   46,   47,   48,   49,   50,   26,
+       26,   26,   51,   52,   53,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -419,144 +419,166 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[52] =
+static const YY_CHAR yy_meta[54] =
     {   0,
-        1,    2,    3,    3,    1,    1,    2,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    4,    1,    5,    1,
-        1,    1,    1,    5,    5,    1,    1,    1,    1,    6,
-        5,    5,    5,    5,    5,    5,    5,    5,    5,    5,
-        5,    5,    5,    5,    5,    5,    5,    5,    1,    1,
-        1
+        1,    1,    2,    3,    2,    4,    1,    5,    1,    1,
+        6,    1,    1,    1,    1,    1,    1,    7,    1,    8,
+        9,    4,    1,    1,    1,    9,    9,    1,    6,    1,
+        1,    9,    8,    8,    9,    9,    9,    8,    9,    9,
+        9,    9,    8,    9,    8,    9,    8,    9,    8,    9,
+        1,    1,    1
     } ;
 
-static const flex_int16_t yy_base[181] =
+static const flex_int16_t yy_base[193] =
     {   0,
-        0,    0,   49,   51,   54,   63,   57,   60,  296,  297,
-       67,  297,   71,  273,  297,  297,  285,   75,  297,  297,
-      279,  297,  276,   63,   73,   75,  297,   74,  269,   75,
-        0,   87,  297,  297,  297,    0,  247,   68,   72,  249,
-       69,   72,  253,  239,  244,  248,  297,  234,  297,  297,
-      297,  280,  264,  112,  118,  123,  129,  114,  125,  134,
-      136,  139,  297,  297,  297,  125,  297,  278,  297,  143,
-      297,  132,  137,  144,  297,  297,  147,  148,    0,  160,
-      297,    0,  151,  261,  152,  244,  234,  246,  235,  239,
-      228,  229,  230,  228,    0,  225,  224,  230,  229,  228,
+        0,    0,   51,   52,   56,   65,   60,   69,  363,  364,
+       72,  364,   77,  338,  364,  364,  351,   81,  364,  364,
+      345,  364,  342,   70,   81,   81,  364,   73,  334,   79,
+        0,  364,  364,  364,  312,   72,   69,  314,   65,   74,
+      318,  304,  309,  313,  364,  299,  364,  364,  364,  347,
+      330,  115,  122,  126,  133,  340,  137,  116,  140,  141,
+      145,  364,  364,  364,   64,  364,  344,  364,  335,  364,
+      134,  140,  364,  364,  144,  148,    0,  156,  364,    0,
+      308,  298,  310,  299,  303,  292,  293,  294,  292,    0,
+      289,  288,  294,  293,  292,  364,  364,  364,  328,  364,
 
-      297,  297,  297,  262,  297,  176,  180,  297,  261,  297,
-      260,  297,  259,  132,  297,  181,  165,  170,  177,  183,
-      184,  187,    0,  188,  191,  242,  229,  224,  215,  212,
-      225,  223,  219,  222,    0,    0,  206,  206,  216,  209,
-      297,  229,  228,  207,    0,    0,  207,  195,  200,    0,
-      185,  166,  165,    0,  159,    0,  149,  115,  110,    0,
-       83,   75,    0,   47,   44,    0,    0,    0,   48,    0,
-        0,  297,  210,  216,  222,  228,  231,  232,  238,   72
+      176,  181,  364,  327,  364,  364,  364,  322,  364,  316,
+      103,  364,    0,  104,  170,  178,  182,    0,  186,  136,
+      190,  279,  273,  264,  259,  269,  257,  252,  224,    0,
+        0,  205,  202,  207,  191,  364,  197,  195,  199,  203,
+      210,  214,  216,    0,  188,    0,    0,  186,  174,  163,
+        0,  154,  149,  157,    0,  152,  218,  220,  224,  226,
+      230,  234,    0,  136,  130,  133,    0,  120,  114,    0,
+      238,  100,   75,    0,    0,    0,   50,    0,    0,  364,
+      259,  268,  277,  286,  289,  291,  299,  307,  312,  313,
+      318,  320
+
     } ;
 
-static const flex_int16_t yy_def[181] =
+static const flex_int16_t yy_def[193] =
     {   0,
-      172,    1,  173,  173,  174,  174,  175,  175,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  176,  172,  172,
-      172,  172,  172,  172,  172,  177,  172,  172,  172,  172,
-      178,  178,  172,  172,  172,  178,  178,  178,  178,  178,
-      178,  178,  178,  178,  178,  178,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  179,  172,  172,  172,  176,
-      172,  172,  172,  172,  172,  172,  172,  177,  180,  180,
-      172,  178,  172,  172,  178,  178,  178,  178,  178,  178,
-      178,  178,  178,  178,  178,  178,  178,  178,  178,  178,
+      180,    1,  181,  181,  182,  182,  183,  183,  180,  180,
+      180,  180,  180,  180,  180,  180,  180,  184,  180,  180,
+      180,  180,  180,  180,  180,  185,  180,  180,  180,  180,
+      186,  180,  180,  180,  186,  186,  186,  186,  186,  186,
+      186,  186,  186,  186,  180,  180,  180,  180,  180,  180,
+      180,  180,  180,  180,  180,  180,  187,  180,  180,  180,
+      180,  180,  180,  180,  188,  180,  180,  180,  189,  180,
+      180,  185,  180,  180,  180,  185,  190,  190,  180,  186,
+      186,  186,  186,  186,  186,  186,  186,  186,  186,  186,
+      186,  186,  186,  186,  186,  180,  180,  180,  180,  180,
 
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  179,  172,  179,  179,  172,  172,  172,
-      172,  172,  180,  180,  172,  172,  178,  178,  178,  178,
-      178,  178,  178,  178,  178,  178,  178,  178,  178,  178,
-      172,  172,  172,  178,  178,  178,  178,  178,  178,  178,
-      178,  178,  178,  178,  178,  178,  178,  178,  178,  178,
-      178,  178,  178,  178,  178,  178,  178,  178,  178,  178,
-      178,    0,  172,  172,  172,  172,  172,  172,  172,  172
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+      188,  180,  191,  188,  180,  190,  185,  190,  180,  180,
+      192,  186,  186,  186,  186,  186,  186,  186,  186,  186,
+      186,  186,  186,  186,  186,  180,  180,  180,  180,  192,
+      190,  185,  180,  190,  186,  186,  186,  186,  186,  186,
+      186,  186,  186,  186,  186,  186,  180,  180,  185,  180,
+      180,  192,  186,  186,  186,  186,  186,  186,  186,  186,
+      185,  186,  186,  186,  186,  186,  186,  186,  186,    0,
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+      180,  180
+
     } ;
 
-static const flex_int16_t yy_nxt[349] =
+static const flex_int16_t yy_nxt[418] =
     {   0,
-       10,   11,   12,   13,   11,   14,   15,   16,   17,   18,
-       19,   20,   16,   21,   22,   23,   24,   25,   26,   27,
-       28,   29,   30,   31,   32,   33,   10,   34,   35,   36,
-       31,   37,   38,   39,   40,   41,   31,   42,   31,   31,
-       31,   31,   43,   44,   31,   31,   45,   46,   47,   48,
-       49,   51,   52,   51,   52,   55,   56,   57,   55,   60,
-       56,   53,   60,   53,   55,   56,   57,   55,   62,   56,
-       62,   62,   62,   63,   62,   62,  123,   67,   68,   72,
-       58,   73,  171,   61,   69,   75,   61,   74,  170,   58,
-       76,   77,  169,   78,   81,   64,   64,   81,   87,   80,
+       10,   11,   12,   11,   13,   11,   14,   15,   16,   17,
+       18,   19,   20,   16,   21,   22,   23,   24,   25,   26,
+       26,   27,   28,   29,   30,   31,   31,   32,   10,   33,
+       34,   31,   31,   35,   36,   37,   38,   39,   31,   40,
+       31,   31,   31,   31,   41,   42,   31,   31,   43,   44,
+       45,   46,   47,   49,   49,   50,   50,   53,   54,   53,
+       55,   53,   59,   56,   51,   51,   53,   54,   53,   55,
+       53,   59,   56,   61,  112,   61,   61,   61,   61,   62,
+       61,   61,   61,   66,   57,   67,  179,   71,   60,   72,
+       72,   68,  113,   57,   73,   79,   63,   60,   75,   74,
 
-       83,   70,   83,   84,   88,   85,   90,   95,   93,   89,
-       94,  168,   96,   91,  103,  104,  108,  109,  105,  106,
-      103,  107,  106,  167,  105,  103,  104,  110,  111,  105,
-      106,  103,  107,  106,  115,  105,  110,  111,  112,  113,
-       62,  141,   62,   62,  166,  172,  172,  172,   72,   66,
-      118,  116,  117,   72,  165,   73,  119,  121,  116,  121,
-       84,  120,  122,   72,   77,   73,   78,   84,   84,  125,
-       85,   74,   80,   83,  115,   83,   84,  106,  124,  106,
-      106,  106,  103,  106,  106,  172,   72,  114,  118,  164,
-      142,  116,  142,  163,  119,  143,   83,  162,   83,   84,
+       76,   76,   63,   79,   82,   85,   88,   78,   89,   69,
+       83,   90,   86,  136,  112,   84,   91,   98,  107,   99,
+      108,  178,  100,  101,   98,  101,  102,  101,   98,  100,
+       99,  113,  113,  100,  101,   98,  101,  102,  101,  103,
+      100,  104,  107,  109,  108,  110,   61,  177,   61,   61,
+       61,   71,  176,  115,  115,  143,  143,   71,  106,   72,
+       72,   71,  175,  117,  117,   75,  116,   76,   76,  174,
+      119,  173,  119,  120,   78,  121,  121,  101,  172,  101,
+      101,  101,  101,   98,  101,  101,  101,   71,  170,  115,
+      115,  169,  138,  168,  138,  139,  137,  140,  140,   71,
 
-       84,  125,  122,   84,   84,  122,  124,   84,  161,  125,
-       50,   50,   50,   50,   50,   50,   54,   54,   54,   54,
-       54,   54,   59,   59,   59,   59,   59,   59,   66,  160,
-       66,   66,   66,   66,   79,   79,   82,   82,  114,  159,
-      158,  114,  114,  114,  157,  156,  143,  143,  155,  154,
-      153,  152,  151,  150,  149,  148,  147,  146,  145,  144,
-      126,  112,  110,  108,  103,  140,  139,  138,  137,  136,
-      135,  134,  133,  132,  131,  130,  129,  128,  127,  126,
-       67,  102,  101,   65,  100,   99,   98,   97,   92,   86,
-       64,   71,   71,   65,   64,  172,    9,  172,  172,  172,
+      167,  117,  117,  120,  166,  142,  142,  120,  141,  121,
+      121,  157,  139,  157,  159,  159,  158,  158,  160,  160,
+      139,  165,  140,  140,  161,  164,  161,  120,  163,  162,
+      162,  120,  156,  142,  142,  143,  143,  158,  158,  158,
+      158,  139,  155,  159,  159,  160,  160,  120,  154,  171,
+      171,  120,  153,  162,  162,  120,  152,  171,  171,   48,
+       48,   48,   48,   48,   48,   48,   48,   48,   52,   52,
+       52,   52,   52,   52,   52,   52,   52,   58,   58,   58,
+       58,   58,   58,   58,   58,   58,   65,   65,  151,   65,
+      150,   65,   65,   65,   65,   77,   77,   77,   80,   80,
 
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172
+      105,  149,  105,  105,  105,  148,  105,  111,  147,  146,
+      111,  145,  111,  111,  111,  111,   65,   65,  109,   65,
+      118,  118,  111,  111,  107,  111,  144,  144,  144,  103,
+       98,  135,  134,  133,  132,  131,  130,  129,  128,  127,
+      126,  125,  124,  123,  122,  114,   66,  100,   97,   96,
+       64,   95,   94,   93,   92,   87,   81,   63,   70,   70,
+       64,   63,  180,    9,  180,  180,  180,  180,  180,  180,
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+      180,  180,  180,  180,  180,  180,  180
     } ;
 
-static const flex_int16_t yy_chk[349] =
+static const flex_int16_t yy_chk[418] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    3,    3,    4,    4,    5,    5,    5,    5,    7,
-        5,    3,    8,    4,    6,    6,    6,    6,   11,    6,
-       11,   11,   13,   13,   13,   13,  180,   18,   18,   24,
-        5,   24,  169,    7,   18,   25,    8,   24,  165,    6,
-       25,   26,  164,   26,   28,   28,   30,   30,   38,   26,
+        1,    1,    1,    3,    4,    3,    4,    5,    5,    5,
+        5,    5,    7,    5,    3,    4,    6,    6,    6,    6,
+        6,    8,    6,   11,   65,   11,   11,   11,   13,   13,
+       13,   13,   13,   18,    5,   18,  177,   24,    7,   24,
+       24,   18,   65,    6,   25,   28,   28,    8,   26,   25,
 
-       32,   18,   32,   32,   38,   32,   39,   42,   41,   38,
-       41,  162,   42,   39,   54,   54,   58,   58,   54,   55,
-       55,   55,   55,  161,   55,   56,   56,   59,   59,   56,
-       57,   57,   57,   57,   66,   57,   60,   60,   61,   61,
-       62,  114,   62,   62,  159,   70,   70,   70,   72,   70,
-       72,   66,   70,   73,  158,   73,   72,   74,  114,   74,
-       74,   73,   74,   77,   78,   77,   78,   83,   85,   83,
-       85,   77,   78,   80,  117,   80,   80,  106,   80,  106,
-      106,  107,  107,  107,  107,  116,  118,  116,  118,  157,
-      119,  117,  119,  155,  118,  119,  120,  153,  120,  120,
+       26,   26,   30,   30,   36,   37,   39,   26,   39,   18,
+       36,   40,   37,  111,  114,   36,   40,   52,   58,   52,
+       58,  173,   52,   53,   53,   53,   53,   53,   54,   53,
+       54,  111,  114,   54,   55,   55,   55,   55,   55,   57,
+       55,   57,   59,   60,   59,   60,   61,  172,   61,   61,
+       61,   71,  169,   71,   71,  120,  120,   72,   57,   72,
+       72,   75,  168,   75,   75,   76,   72,   76,   76,  166,
+       78,  165,   78,   78,   76,   78,   78,  101,  164,  101,
+      101,  101,  102,  102,  102,  102,  102,  115,  156,  115,
+      115,  154,  116,  153,  116,  116,  115,  116,  116,  117,
 
-      121,  120,  121,  122,  124,  122,  124,  125,  152,  125,
-      173,  173,  173,  173,  173,  173,  174,  174,  174,  174,
-      174,  174,  175,  175,  175,  175,  175,  175,  176,  151,
-      176,  176,  176,  176,  177,  177,  178,  178,  179,  149,
-      148,  179,  179,  179,  147,  144,  143,  142,  140,  139,
-      138,  137,  134,  133,  132,  131,  130,  129,  128,  127,
-      126,  113,  111,  109,  104,  100,   99,   98,   97,   96,
-       94,   93,   92,   91,   90,   89,   88,   87,   86,   84,
-       68,   53,   52,   48,   46,   45,   44,   43,   40,   37,
-       29,   23,   21,   17,   14,    9,  172,  172,  172,  172,
+      152,  117,  117,  119,  150,  119,  119,  121,  117,  121,
+      121,  137,  138,  137,  138,  138,  137,  137,  139,  139,
+      140,  149,  140,  140,  141,  148,  141,  141,  145,  141,
+      141,  142,  135,  142,  142,  143,  143,  157,  157,  158,
+      158,  159,  134,  159,  159,  160,  160,  161,  133,  161,
+      161,  162,  132,  162,  162,  171,  129,  171,  171,  181,
+      181,  181,  181,  181,  181,  181,  181,  181,  182,  182,
+      182,  182,  182,  182,  182,  182,  182,  183,  183,  183,
+      183,  183,  183,  183,  183,  183,  184,  184,  128,  184,
+      127,  184,  184,  184,  184,  185,  185,  185,  186,  186,
 
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172,  172,  172,
-      172,  172,  172,  172,  172,  172,  172,  172
+      187,  126,  187,  187,  187,  125,  187,  188,  124,  123,
+      188,  122,  188,  188,  188,  188,  189,  189,  110,  189,
+      190,  190,  191,  191,  108,  191,  192,  192,  192,  104,
+       99,   95,   94,   93,   92,   91,   89,   88,   87,   86,
+       85,   84,   83,   82,   81,   69,   67,   56,   51,   50,
+       46,   44,   43,   42,   41,   38,   35,   29,   23,   21,
+       17,   14,    9,  180,  180,  180,  180,  180,  180,  180,
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+
+      180,  180,  180,  180,  180,  180,  180,  180,  180,  180,
+      180,  180,  180,  180,  180,  180,  180
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -575,7 +597,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "2005033.l"
 #line 4 "2005033.l"
-#include "2005033_SymbolTable.hpp"
+#include "2005033.hpp"
 #include <algorithm>
 int line_count= 1;
 int err_count = 0;
@@ -597,11 +619,9 @@ void checkIndentation() {
     if (spaceCount > 0) {
         fprintf(logout, "Line# %d: Warning, tab required but got space.\n", line_count);
 		warning_count++;
-        // You might want to increase the warning/error count here
     } else if (tabCount != requiredTab) {
         fprintf(logout, "Line# %d: warning, %d of tabs needed but got %d tabs.\n", line_count, requiredTab, tabCount);
 		warning_count++;
-        // You might want to increase the warning/error count here
     }
     tabCount = spaceCount = 0;
 }
@@ -610,7 +630,13 @@ char getEscapeChar(char escapeSeq) {
     switch (escapeSeq) {
         case 'n': return '\n';
         case 't': return '\t';
+		case 'a': return '\a';
+		case 'f': return '\f';
         case 'r': return '\r';
+		case 'b': return '\b';
+		case 'v': return '\v';
+		case '0': return '\0';
+		 
         // Add more escape sequences as needed
         default: return escapeSeq; // Treat unknown escape sequences as the literal character
     }
@@ -637,9 +663,14 @@ string replaceEscapeSequences(string input) {
 }
 
 string processString(string str){
-	str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
-	str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
-	string s = replaceEscapeSequences(str);
+	// str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
+	// str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
+	string str1 = "";
+	for(int i=0; i<str.length(); i++){
+		if(str[i]!='\n' and str[i]!='\r')
+			str1+=str[i];
+	}
+	string s = replaceEscapeSequences(str1);
 	return s.substr(1,s.length()-2);
 }
 
@@ -654,9 +685,9 @@ string truncateNewline(string str){
 void startLine(){
 	lineStarted = true; spaceCount = tabCount = 0;
 }
-#line 658 "2005033.cpp"
+#line 689 "2005033.cpp"
 
-#line 660 "2005033.cpp"
+#line 691 "2005033.cpp"
 
 #define INITIAL 0
 #define IN_COMMENT 1
@@ -876,10 +907,10 @@ YY_DECL
 		}
 
 	{
-#line 109 "2005033.l"
+#line 114 "2005033.l"
 
 
-#line 883 "2005033.cpp"
+#line 914 "2005033.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -906,13 +937,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 173 )
+				if ( yy_current_state >= 181 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 297 );
+		while ( yy_base[yy_current_state] != 364 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -939,12 +970,12 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 111 "2005033.l"
+#line 116 "2005033.l"
 {line_count++; startLine();}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 113 "2005033.l"
+#line 118 "2005033.l"
 {
 	if(lineStarted){
 		for(int i=0; i<strlen(yytext); i++){
@@ -958,7 +989,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 123 "2005033.l"
+#line 128 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -970,7 +1001,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 132 "2005033.l"
+#line 137 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -982,7 +1013,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 141 "2005033.l"
+#line 146 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -994,7 +1025,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 150 "2005033.l"
+#line 155 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1006,7 +1037,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 159 "2005033.l"
+#line 164 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1018,7 +1049,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 168 "2005033.l"
+#line 173 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1030,7 +1061,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 177 "2005033.l"
+#line 182 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1042,7 +1073,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 186 "2005033.l"
+#line 191 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1054,7 +1085,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 195 "2005033.l"
+#line 200 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1066,7 +1097,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 204 "2005033.l"
+#line 209 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1078,7 +1109,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 213 "2005033.l"
+#line 218 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1090,7 +1121,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 222 "2005033.l"
+#line 227 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1102,7 +1133,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 231 "2005033.l"
+#line 236 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1114,7 +1145,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 240 "2005033.l"
+#line 245 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1126,7 +1157,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 249 "2005033.l"
+#line 254 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1138,7 +1169,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 258 "2005033.l"
+#line 263 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1150,7 +1181,307 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 266 "2005033.l"
+#line 272 "2005033.l"
+{ 
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<CONST_INT, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <CONST_INT> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 20:
+YY_RULE_SETUP
+#line 281 "2005033.l"
+{ 
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<CONST_FLOAT, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <CONST_FLOAT> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 21:
+YY_RULE_SETUP
+#line 290 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			err_count++;
+			fprintf(logout,"Error at line# %d: TOO_MANY_DECIMAL_POINTS %s\n",line_count,yytext);
+		}
+	YY_BREAK
+case 22:
+YY_RULE_SETUP
+#line 299 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			err_count++;
+			fprintf(logout,"Error at line# %d: ILLFORMED_NUMBER %s\n",line_count,yytext);
+		}
+	YY_BREAK
+case 23:
+YY_RULE_SETUP
+#line 309 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			string str(yytext);
+			fprintf(tokenout,"<CONST_CHAR, %s>\n",processString(str).c_str());
+			fprintf(logout,"Line# %d: Token <CONST_CHAR> Lexeme %s found\n",line_count,processString(str).c_str());
+		}
+	YY_BREAK
+case 24:
+YY_RULE_SETUP
+#line 319 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			err_count++;
+			fprintf(logout,"Error at line# %d: EMPTY_CONST_CHAR %s\n",line_count,yytext);
+		}
+	YY_BREAK
+case 25:
+/* rule 25 can match eol */
+YY_RULE_SETUP
+#line 328 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			err_count++;
+			string str(yytext);
+			fprintf(logout,"Error at line# %d: UNFINISHED_CONST_CHAR %s\n",line_count,truncateNewline(str).c_str());
+			if(str[str.length() - 1] == '\n'){ 
+				line_count++;
+				startLine();
+			}
+		}
+	YY_BREAK
+case 26:
+YY_RULE_SETUP
+#line 342 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			err_count++;
+			fprintf(logout,"Error at line# %d: MULTICHAR_CONST_CHAR %s\n",line_count,yytext);
+		}
+	YY_BREAK
+case 27:
+YY_RULE_SETUP
+#line 352 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<INCOP, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <INCOP> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 28:
+YY_RULE_SETUP
+#line 361 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<ADDOP, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <ADDOP> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 29:
+YY_RULE_SETUP
+#line 370 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<MULOP, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <MULOP> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 30:
+YY_RULE_SETUP
+#line 379 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<LOGICOP, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <LOGICOP> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 31:
+YY_RULE_SETUP
+#line 388 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<BITOP, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <BITOP> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 32:
+YY_RULE_SETUP
+#line 397 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<RELOP, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <RELOP> Lexeme %s found\n",line_count,yytext);
+		}		
+	YY_BREAK
+case 33:
+YY_RULE_SETUP
+#line 406 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<ASSIGNOP, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <ASSIGNOP> Lexeme %s found\n",line_count,yytext);
+		}			
+	YY_BREAK
+case 34:
+YY_RULE_SETUP
+#line 415 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<NOT, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <NOT> Lexeme %s found\n",line_count,yytext);
+		}			
+	YY_BREAK
+case 35:
+YY_RULE_SETUP
+#line 424 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<LPAREN, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <LPAREN> Lexeme %s found\n",line_count,yytext);
+		}			
+	YY_BREAK
+case 36:
+YY_RULE_SETUP
+#line 433 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<RPAREN, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <RPAREN> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 37:
+YY_RULE_SETUP
+#line 442 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}
+			requiredTab++;	
+			symboltable->EnterScope();
+			fprintf(tokenout,"<LCURL, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <LCURL> Lexeme %s found\n",line_count,yytext);
+		
+	}			
+	YY_BREAK
+case 38:
+YY_RULE_SETUP
+#line 454 "2005033.l"
+{
+			if(requiredTab>0) requiredTab--;
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			symboltable->ExitScope();
+			fprintf(tokenout,"<RCURL, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <RCURL> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 39:
+YY_RULE_SETUP
+#line 465 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<LSQUARE, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <LSQUARE> Lexeme %s found\n",line_count,yytext);
+		}			
+	YY_BREAK
+case 40:
+YY_RULE_SETUP
+#line 474 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<RSQUARE, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <RSQUARE> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 41:
+YY_RULE_SETUP
+#line 483 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<COMMA, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <COMMA> Lexeme %s found\n",line_count,yytext);
+		}			
+	YY_BREAK
+case 42:
+YY_RULE_SETUP
+#line 492 "2005033.l"
+{
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<SEMICOLON, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <SEMICOLON> Lexeme %s found\n",line_count,yytext);
+		}
+	YY_BREAK
+case 43:
+YY_RULE_SETUP
+#line 500 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1165,57 +1496,9 @@ YY_RULE_SETUP
 				fprintf(logout,"\t%s already exists in the current ScopeTable\n",yytext);	
 		}
 	YY_BREAK
-case 20:
+case 44:
 YY_RULE_SETUP
-#line 280 "2005033.l"
-{ 
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<CONST_INT, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <CONST_INT> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 21:
-YY_RULE_SETUP
-#line 289 "2005033.l"
-{ 
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<CONST_FLOAT, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <CONST_FLOAT> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 22:
-YY_RULE_SETUP
-#line 298 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			err_count++;
-			fprintf(logout,"Error at line# %d: TOO_MANY_DECIMAL_POINTS %s\n",line_count,yytext);
-		}
-	YY_BREAK
-case 23:
-YY_RULE_SETUP
-#line 307 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			err_count++;
-			fprintf(logout,"Error at line# %d: ILLFORMED_NUMBER %s\n",line_count,yytext);
-		}
-	YY_BREAK
-case 24:
-YY_RULE_SETUP
-#line 316 "2005033.l"
+#line 513 "2005033.l"
 {
 			if(lineStarted){
 				checkIndentation();
@@ -1225,261 +1508,9 @@ YY_RULE_SETUP
 			fprintf(logout,"Error at line# %d: INVALID_ID_SUFFIX_NUM_PREFIX %s\n",line_count,yytext);
 		}
 	YY_BREAK
-case 25:
-YY_RULE_SETUP
-#line 325 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			string str(yytext);
-			fprintf(tokenout,"<CONST_CHAR, %s>\n",processString(str).c_str());
-			fprintf(logout,"Line# %d: Token <CONST_CHAR> Lexeme %s found\n",line_count,processString(str).c_str());
-		}
-	YY_BREAK
-case 26:
-YY_RULE_SETUP
-#line 335 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			err_count++;
-			fprintf(logout,"Error at line# %d: EMPTY_CONST_CHAR %s\n",line_count,yytext);
-		}
-	YY_BREAK
-case 27:
-/* rule 27 can match eol */
-YY_RULE_SETUP
-#line 344 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			err_count++;
-			string str(yytext);
-			fprintf(logout,"Error at line# %d: UNFINISHED_CONST_CHAR %s\n",line_count,truncateNewline(str).c_str());
-			if(str[str.length() - 1] == '\n'){ 
-				line_count++;
-				lineStarted = true;
-			}
-		}
-	YY_BREAK
-case 28:
-YY_RULE_SETUP
-#line 358 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			err_count++;
-			fprintf(logout,"Error at line# %d: MULTICHAR_CONST_CHAR %s\n",line_count,yytext);
-		}
-	YY_BREAK
-case 29:
-YY_RULE_SETUP
-#line 368 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<INCOP, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <INCOP> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 30:
-YY_RULE_SETUP
-#line 377 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<ADDOP, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <ADDOP> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 31:
-YY_RULE_SETUP
-#line 386 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<MULOP, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <MULOP> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 32:
-YY_RULE_SETUP
-#line 395 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<LOGICOP, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <LOGICOP> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 33:
-YY_RULE_SETUP
-#line 404 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<BITOP, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <BITOP> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 34:
-YY_RULE_SETUP
-#line 413 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<RELOP, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <RELOP> Lexeme %s found\n",line_count,yytext);
-		}		
-	YY_BREAK
-case 35:
-YY_RULE_SETUP
-#line 422 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<ASSIGNOP, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <ASSIGNOP> Lexeme %s found\n",line_count,yytext);
-		}			
-	YY_BREAK
-case 36:
-YY_RULE_SETUP
-#line 431 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<NOT, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <NOT> Lexeme %s found\n",line_count,yytext);
-		}			
-	YY_BREAK
-case 37:
-YY_RULE_SETUP
-#line 440 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<LPAREN, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <LPAREN> Lexeme %s found\n",line_count,yytext);
-		}			
-	YY_BREAK
-case 38:
-YY_RULE_SETUP
-#line 449 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<RPAREN, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <RPAREN> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 39:
-YY_RULE_SETUP
-#line 458 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}
-			requiredTab++;	
-			symboltable->EnterScope();
-			fprintf(tokenout,"<LCURL, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <LCURL> Lexeme %s found\n",line_count,yytext);
-		
-	}			
-	YY_BREAK
-case 40:
-YY_RULE_SETUP
-#line 470 "2005033.l"
-{
-			if(requiredTab>0) requiredTab--;
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			symboltable->ExitScope();
-			fprintf(tokenout,"<RCURL, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <RCURL> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 41:
-YY_RULE_SETUP
-#line 481 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<LSQUARE, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <LSQUARE> Lexeme %s found\n",line_count,yytext);
-		}			
-	YY_BREAK
-case 42:
-YY_RULE_SETUP
-#line 490 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<RSQUARE, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <RSQUARE> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
-case 43:
-YY_RULE_SETUP
-#line 499 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<COMMA, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <COMMA> Lexeme %s found\n",line_count,yytext);
-		}			
-	YY_BREAK
-case 44:
-YY_RULE_SETUP
-#line 508 "2005033.l"
-{
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<SEMICOLON, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <SEMICOLON> Lexeme %s found\n",line_count,yytext);
-		}
-	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 518 "2005033.l"
+#line 522 "2005033.l"
 {
 	if(lineStarted){
 		checkIndentation();
@@ -1494,9 +1525,93 @@ YY_RULE_SETUP
 	YY_BREAK
 
 case 46:
-/* rule 46 can match eol */
 YY_RULE_SETUP
-#line 530 "2005033.l"
+#line 534 "2005033.l"
+{
+		if(lineStarted){
+			for(int i=0; i<strlen(yytext); i++){
+				if(yytext[i]=='\t')
+					tabCount++;
+				else if(yytext[i]==' ')
+					spaceCount++;
+			}
+		}
+		string temp(yytext);
+		stringText+=temp;
+	}
+	YY_BREAK
+case 47:
+YY_RULE_SETUP
+#line 546 "2005033.l"
+{
+		if(lineStarted){
+			checkIndentation();
+			lineStarted = false;
+		}		
+		string temp(yytext);
+		stringText+=temp;
+	}
+	YY_BREAK
+case 48:
+/* rule 48 can match eol */
+YY_RULE_SETUP
+#line 554 "2005033.l"
+{
+		if(lineStarted){
+			checkIndentation();
+			lineStarted = false;
+		}	
+		string temp(yytext);
+		stringText+=temp;
+		line_count++;
+		startLine();
+	}
+	YY_BREAK
+case 49:
+/* rule 49 can match eol */
+YY_RULE_SETUP
+#line 564 "2005033.l"
+{
+		if(lineStarted){
+			checkIndentation();
+			lineStarted = false;
+		}
+		
+		string temp(yytext);
+        stringText+=temp;
+		string str(stringText);
+		fprintf(logout,"Error at line# %d: UNFINISHED_STRING %s\n",line_count,truncateNewline(str).c_str());
+		err_count++;
+		line_count++;
+		lineStarted = true;
+		BEGIN(INITIAL);
+	}
+	YY_BREAK
+case YY_STATE_EOF(IN_STRING):
+#line 579 "2005033.l"
+{
+		string temp(yytext);
+        stringText+=temp;
+		err_count++;
+		fprintf(logout,"Error at line# %d: UNFINISHED_STRING %s\n",line_count,stringText.c_str());
+		BEGIN(INITIAL);
+	}
+	YY_BREAK
+case 50:
+YY_RULE_SETUP
+#line 586 "2005033.l"
+{
+		string temp(yytext);
+        stringText+=temp;
+		err_count++;
+		fprintf(logout,"Error at line# %d: UNFINISHED_STRING %s\n",line_count,stringText.c_str());
+		BEGIN(INITIAL);
+	}
+	YY_BREAK
+case 51:
+/* rule 51 can match eol */
+YY_RULE_SETUP
+#line 593 "2005033.l"
 {
 		if(lineStarted){
 			checkIndentation();
@@ -1515,78 +1630,10 @@ YY_RULE_SETUP
         BEGIN(INITIAL);
 	}
 	YY_BREAK
-case 47:
-YY_RULE_SETUP
-#line 547 "2005033.l"
-{
-		if(lineStarted){
-			for(int i=0; i<strlen(yytext); i++){
-				if(yytext[i]=='\t')
-					tabCount++;
-				else if(yytext[i]==' ')
-					spaceCount++;
-			}
-		}
-		string temp(yytext);
-		stringText+=temp;
-	}
-	YY_BREAK
-case 48:
-YY_RULE_SETUP
-#line 559 "2005033.l"
-{
-		if(lineStarted){
-			checkIndentation();
-			lineStarted = false;
-		}		
-		string temp(yytext);
-		stringText+=temp;
-	}
-	YY_BREAK
-case 49:
-/* rule 49 can match eol */
-YY_RULE_SETUP
-#line 567 "2005033.l"
-{
-		if(lineStarted){
-			checkIndentation();
-			lineStarted = false;
-		}	
-		string temp(yytext);
-		stringText+=temp;
-		line_count++;
-		startLine();
-	}
-	YY_BREAK
-case 50:
-/* rule 50 can match eol */
-YY_RULE_SETUP
-#line 577 "2005033.l"
-{
-		string temp(yytext);
-        stringText+=temp;
-		string str(stringText);
-		fprintf(logout,"Error at line# %d: UNFINISHED_STRING %s\n",line_count,truncateNewline(str).c_str());
-		err_count++;
-		line_count++;
-		lineStarted = true;
-		BEGIN(INITIAL);
-	}
-	YY_BREAK
-case YY_STATE_EOF(IN_STRING):
-#line 587 "2005033.l"
-{
-		string temp(yytext);
-        stringText+=temp;
-		err_count++;
-		fprintf(logout,"Error at line# %d: UNFINISHED_STRING %s\n",line_count,stringText.c_str());
-		BEGIN(INITIAL);
-	}
-	YY_BREAK
 
-case 51:
+case 52:
 YY_RULE_SETUP
-#line 597 "2005033.l"
+#line 613 "2005033.l"
 {
 	comment_start = line_count;
 	commentText = "";
@@ -1596,9 +1643,9 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 
-case 52:
+case 53:
 YY_RULE_SETUP
-#line 606 "2005033.l"
+#line 622 "2005033.l"
 {
 		string temp(yytext);
         commentText+=temp;
@@ -1606,26 +1653,26 @@ YY_RULE_SETUP
 		BEGIN(INITIAL);
     }
 	YY_BREAK
-case 53:
-/* rule 53 can match eol */
+case 54:
+/* rule 54 can match eol */
 YY_RULE_SETUP
-#line 612 "2005033.l"
+#line 628 "2005033.l"
 {
 		string temp(yytext);
         commentText+=temp;
         line_count++;
     }
 	YY_BREAK
-case 54:
+case 55:
 YY_RULE_SETUP
-#line 617 "2005033.l"
+#line 633 "2005033.l"
 {
 		string temp(yytext);
 		commentText+=temp;
     }
 	YY_BREAK
 case YY_STATE_EOF(IN_COMMENT):
-#line 621 "2005033.l"
+#line 637 "2005033.l"
 {
 		string temp(yytext);
         commentText+=temp;
@@ -1635,9 +1682,9 @@ case YY_STATE_EOF(IN_COMMENT):
 	}
 	YY_BREAK
 
-case 55:
+case 56:
 YY_RULE_SETUP
-#line 630 "2005033.l"
+#line 646 "2005033.l"
 {
 	comment_start = line_count;
 	commentText = "";
@@ -1647,10 +1694,10 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 
-case 56:
-/* rule 56 can match eol */
+case 57:
+/* rule 57 can match eol */
 YY_RULE_SETUP
-#line 639 "2005033.l"
+#line 655 "2005033.l"
 {
 		string temp(yytext);
         commentText+=temp;
@@ -1661,26 +1708,26 @@ YY_RULE_SETUP
 		BEGIN(INITIAL);
     }
 	YY_BREAK
-case 57:
-/* rule 57 can match eol */
+case 58:
+/* rule 58 can match eol */
 YY_RULE_SETUP
-#line 648 "2005033.l"
+#line 664 "2005033.l"
 {
 		string temp(yytext);
 		commentText+=temp;
 		line_count++;
 	}
 	YY_BREAK
-case 58:
+case 59:
 YY_RULE_SETUP
-#line 653 "2005033.l"
+#line 669 "2005033.l"
 {
 		string temp(yytext);
 		commentText+=temp;
     }
 	YY_BREAK
 case YY_STATE_EOF(IN_SINGLE_COMMENT):
-#line 657 "2005033.l"
+#line 673 "2005033.l"
 {
 		string temp(yytext);
         commentText+=temp;
@@ -1689,20 +1736,24 @@ case YY_STATE_EOF(IN_SINGLE_COMMENT):
 	}
 	YY_BREAK
 
-case 59:
+case 60:
 YY_RULE_SETUP
-#line 665 "2005033.l"
+#line 681 "2005033.l"
 {
+		if(lineStarted){
+			checkIndentation();
+			lineStarted = false;
+	}
 			err_count++;
 			fprintf(logout,"Error at line# %d: UNRECOGNIZED_CHAR %s\n",line_count,yytext);
 		}
 	YY_BREAK
-case 60:
+case 61:
 YY_RULE_SETUP
-#line 669 "2005033.l"
+#line 689 "2005033.l"
 ECHO;
 	YY_BREAK
-#line 1706 "2005033.cpp"
+#line 1757 "2005033.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1999,7 +2050,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 173 )
+			if ( yy_current_state >= 181 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -2027,11 +2078,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 173 )
+		if ( yy_current_state >= 181 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 172);
+	yy_is_jam = (yy_current_state == 180);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2707,7 +2758,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 669 "2005033.l"
+#line 689 "2005033.l"
 
 
 int main(int argc,char *argv[]){

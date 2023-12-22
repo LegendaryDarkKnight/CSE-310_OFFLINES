@@ -1,8 +1,7 @@
 %option noyywrap
 
 %{
-#include "2005033_SymbolTable.hpp"
-#include <algorithm>
+#include "2005033.hpp"
 int line_count= 1;
 int err_count = 0;
 int warning_count = 0;
@@ -34,7 +33,13 @@ char getEscapeChar(char escapeSeq) {
     switch (escapeSeq) {
         case 'n': return '\n';
         case 't': return '\t';
+		case 'a': return '\a';
+		case 'f': return '\f';
         case 'r': return '\r';
+		case 'b': return '\b';
+		case 'v': return '\v';
+		case '0': return '\0';
+		 
         // Add more escape sequences as needed
         default: return escapeSeq; // Treat unknown escape sequences as the literal character
     }
@@ -61,9 +66,12 @@ string replaceEscapeSequences(string input) {
 }
 
 string processString(string str){
-	str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
-	str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
-	string s = replaceEscapeSequences(str);
+	string str1 = "";
+	for(int i=0; i<str.length(); i++){
+		if(str[i]!='\n' and str[i]!='\r')
+			str1+=str[i];
+	}
+	string s = replaceEscapeSequences(str1);
 	return s.substr(1,s.length()-2);
 }
 
@@ -85,22 +93,18 @@ LETTER [a-zA-Z]
 DIGIT [0-9]
 NEWLINE \r?\n
 UNSPECIFIED [^a-zA-Z0-9\r\n \t\f\r\v\'\"]
+IDENTIFIER (_|{LETTER})({LETTER}|_|{DIGIT})*
 CONST_INTEGER {DIGIT}+
-CONST_FLOAT {DIGIT}*(\.{DIGIT}+)?(E[+-]?{DIGIT}+)?
-TOO_MANY_POINTS {DIGIT}*\.({DIGIT}*\.{DIGIT}*)+(E[+-]?{DIGIT}+)?
-ILLFORMED_NUMBER {DIGIT}*(\.{DIGIT}*)?E[+-]?({DIGIT}*\.{DIGIT}*)?
-INVALID_ID {DIGIT}+{LETTER}({LETTER}|{DIGIT})+
-CHARACTER [^\'\"\\\t\f\r\v\r\n]|\\[^ \t\f\r\v\r\n]
+CONST_FLOAT (({DIGIT}+(\.{DIGIT}+)?(E[+-]?{DIGIT}+))|({DIGIT}*(\.{DIGIT}+)(E[+-]?{DIGIT}+)?))
+TOO_MANY_POINTS {DIGIT}*\.({DIGIT}*\.{DIGIT}*)+({DIGIT}+E[+-]?{DIGIT}+)?
+ILLFORMED_NUMBER (({DIGIT}+(\.{DIGIT}+)?(E[+-]?({DIGIT}*\.{DIGIT}*)))|((\.{DIGIT}+)(E[+-]?({DIGIT}*\.{DIGIT}*))))
 EMPTY_CONST_CHAR "''"
 CONST_CHAR \'{CHARACTER}\'
 UNFINISHED_CONST_CHAR \'({CHARACTER}|\\\'|\r?\n)
 MULTICHAR_CONST_CHAR \'{CHARACTER}{CHARACTER}+\'
+CHARACTER [^\'\"\\\f\r\v\r\n]|\\[\"\'\\ntafrbv0]
+INVALID_ID ({CONST_FLOAT}|{CONST_INTEGER}){IDENTIFIER}
 
-SINGLE_LINE_STRING \"([^\\\r\n\"]*|\\[^ \t\f\r\v\r\n])*\"
-MULTI_LINE_STRING_PREFIX \"([^\\\r\n\"]*|\\([^ \t\f\r\v]+|\r?\n))*
-SINGLE_COMMENT1 \/\/([^\\\r\n\"]*|\\([^ \t\f\r\v]+|\r?\n))*(\r?\n)
-SINGLE_COMMENT2 \/\/[^\r\n]*(\r?\n)
-MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
 
 %x IN_COMMENT IN_STRING IN_SINGLE_COMMENT
 
@@ -261,19 +265,6 @@ MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
 			fprintf(tokenout,"<CONTINUE, continue>\n");
 			fprintf(logout,"Line# %d: Token <CONTINUE> Lexeme %s found\n",line_count,yytext);
 		}
-(_|{LETTER})({LETTER}|_|{DIGIT})* {
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			fprintf(tokenout,"<ID, %s>\n",yytext);
-			fprintf(logout,"Line# %d: Token <ID> Lexeme %s found\n",line_count,yytext);
-			string s(yytext);
-			if(symboltable->Insert(s, "ID"))
-				symboltable->printAll(logout);
-			else
-				fprintf(logout,"\t%s already exists in the current ScopeTable\n",yytext);	
-		}
 
 {CONST_INTEGER} { 
 			if(lineStarted){
@@ -311,14 +302,6 @@ MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
 			fprintf(logout,"Error at line# %d: ILLFORMED_NUMBER %s\n",line_count,yytext);
 		}
 
-{INVALID_ID} {
-			if(lineStarted){
-				checkIndentation();
-				lineStarted = false;
-			}	
-			err_count++;
-			fprintf(logout,"Error at line# %d: INVALID_ID_SUFFIX_NUM_PREFIX %s\n",line_count,yytext);
-		}
 
 {CONST_CHAR} {
 			if(lineStarted){
@@ -349,7 +332,7 @@ MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
 			fprintf(logout,"Error at line# %d: UNFINISHED_CONST_CHAR %s\n",line_count,truncateNewline(str).c_str());
 			if(str[str.length() - 1] == '\n'){ 
 				line_count++;
-				lineStarted = true;
+				startLine();
 			}
 		}
 
@@ -511,7 +494,27 @@ MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
 			fprintf(tokenout,"<SEMICOLON, %s>\n",yytext);
 			fprintf(logout,"Line# %d: Token <SEMICOLON> Lexeme %s found\n",line_count,yytext);
 		}
-
+{IDENTIFIER} {
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			fprintf(tokenout,"<ID, %s>\n",yytext);
+			fprintf(logout,"Line# %d: Token <ID> Lexeme %s found\n",line_count,yytext);
+			string s(yytext);
+			if(symboltable->Insert(s, "ID"))
+				symboltable->printAll(logout);
+			else
+				fprintf(logout,"\t%s already exists in the current ScopeTable\n",yytext);	
+		}
+{INVALID_ID} {
+			if(lineStarted){
+				checkIndentation();
+				lineStarted = false;
+			}	
+			err_count++;
+			fprintf(logout,"Error at line# %d: INVALID_ID_SUFFIX_NUM_PREFIX %s\n",line_count,yytext);
+		}
 
 \" {
 	if(lineStarted){
@@ -525,24 +528,7 @@ MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
     BEGIN(IN_STRING);
 } 
 <IN_STRING>{
-	[^\\]["] {
-		if(lineStarted){
-			checkIndentation();
-			lineStarted = false;
-		}	
-		string temp(yytext);
-        stringText+=temp;
-		if(string_start == line_count){
-			fprintf(tokenout,"<SINGLE LINE STRING, %s>\n", processString(stringText).c_str());
-			fprintf(logout,"Line# %d: Token <SINGLE LINE STRING> Lexeme %s found\n",string_start,stringText.c_str());
-		}
-		else{
-			fprintf(tokenout,"<MULTI LINE STRING, %s>\n", processString(stringText).c_str());
-			fprintf(logout,"Line# %d: Token <MULTI LINE STRING> Lexeme %s found\n",string_start,stringText.c_str());
-		}
-        BEGIN(INITIAL);
-	}
-	[ \t\f\r\v]+ {
+	[ \t\f\r\v]* {
 		if(lineStarted){
 			for(int i=0; i<strlen(yytext); i++){
 				if(yytext[i]=='\t')
@@ -554,7 +540,7 @@ MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
 		string temp(yytext);
 		stringText+=temp;
 	}
-	[^\r\n\"] {
+	[^\\\r\n\"]|(\\[ \"\'\\ntafrbv0]) {
 		if(lineStarted){
 			checkIndentation();
 			lineStarted = false;
@@ -572,7 +558,12 @@ MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
 		line_count++;
 		startLine();
 	}
-	[^\\](\r?\n) {
+	[^\\\"](\r?\n) {
+		if(lineStarted){
+			checkIndentation();
+			lineStarted = false;
+		}
+		
 		string temp(yytext);
         stringText+=temp;
 		string str(stringText);
@@ -588,6 +579,30 @@ MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
 		err_count++;
 		fprintf(logout,"Error at line# %d: UNFINISHED_STRING %s\n",line_count,stringText.c_str());
 		BEGIN(INITIAL);
+	}
+	\\\; {
+		string temp(yytext);
+        stringText+=temp;
+		err_count++;
+		fprintf(logout,"Error at line# %d: UNFINISHED_STRING %s\n",line_count,stringText.c_str());
+		BEGIN(INITIAL);
+	}
+	[^\\]?\" {
+		if(lineStarted){
+			checkIndentation();
+			lineStarted = false;
+		}	
+		string temp(yytext);
+        stringText+=temp;
+		if(string_start == line_count){
+			fprintf(tokenout,"<SINGLE LINE STRING, %s>\n", processString(stringText).c_str());
+			fprintf(logout,"Line# %d: Token <SINGLE LINE STRING> Lexeme %s found\n",string_start,stringText.c_str());
+		}
+		else{
+			fprintf(tokenout,"<MULTI LINE STRING, %s>\n", processString(stringText).c_str());
+			fprintf(logout,"Line# %d: Token <MULTI LINE STRING> Lexeme %s found\n",string_start,stringText.c_str());
+		}
+        BEGIN(INITIAL);
 	}
 
 }
@@ -660,7 +675,11 @@ MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
 	}
 }
  
-{UNSPECIFIED} {
+. {
+		if(lineStarted){
+			checkIndentation();
+			lineStarted = false;
+	}
 			err_count++;
 			fprintf(logout,"Error at line# %d: UNRECOGNIZED_CHAR %s\n",line_count,yytext);
 		}

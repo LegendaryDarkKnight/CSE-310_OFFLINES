@@ -1,0 +1,10 @@
+
+
+CONST_FLOAT2 {DIGIT}*(\.{DIGIT}+)?(E[+-]?{DIGIT}+)?
+TOO_MANY_POINTS2 {DIGIT}*\.({DIGIT}*\.{DIGIT}*)+(E[+-]?{DIGIT}+)?
+ILLFORMED_NUMBER2 {DIGIT}*(\.{DIGIT}*)?E[+-]?({DIGIT}*\.{DIGIT}*)?
+SINGLE_LINE_STRING \"([^\\\r\n\"]*|\\[^ \t\f\r\v\r\n])*\"
+MULTI_LINE_STRING_PREFIX \"([^\\\r\n\"]*|\\([^ \t\f\r\v]+|\r?\n))*
+SINGLE_COMMENT1 \/\/([^\\\r\n\"]*|\\([^ \t\f\r\v]+|\r?\n))*(\r?\n)
+SINGLE_COMMENT2 \/\/[^\r\n]*(\r?\n)
+MULTI_COMMENT \/[*]([*]*)?([^*]*[*]+[^*/])*[^*]*[*]+\/
