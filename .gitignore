@@ -11,3 +11,7 @@ FLEX MATERIAL
 a.cpp
 yrs.txt*
 test.cpp
+*.o
+*.tab.h
+Offline 3
+lex.yy.c
