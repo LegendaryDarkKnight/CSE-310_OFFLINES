@@ -5,7 +5,6 @@
 #include "y.tab.h"
 int line_count= 1;
 int err_count = 0;
-
 #define YYSTYPE SymbolInfo*
 extern YYSTYPE yylval;
 extern SymbolTable *table;
@@ -170,8 +169,8 @@ INVALID_ID ({CONST_FLOAT}|{CONST_INTEGER}){IDENTIFIER}
 	}			
 
 [\}]	{
-			table->ExitScope();
 			fprintf(logout,"Line# %d: Token <RCURL> Lexeme %s found\n",line_count,yytext);
+			
 			return RCURL;
 		}
 

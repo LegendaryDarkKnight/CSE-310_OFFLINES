@@ -1,24 +1,67 @@
+#ifndef HELLO_SOMIK
+#define HELLO_SOMIK
+
 #include <iostream>
 #include <stdio.h>
 #include <cstring>
 
 using namespace std;
 
+class FuncExtras
+{
+    string returnType;
+    string *parameterList;
+    int numberOfParameters;
+    bool defined;
+
+public:
+    FuncExtras(string returnType,string *parameterList,int numberOfParameters, bool defined):returnType(returnType), parameterList(parameterList), numberOfParameters(numberOfParameters),defined(defined)
+    {}
+    ~FuncExtras(){
+        delete parameterList;
+    }
+    string getReturnType(){
+        return returnType;
+    }
+    string* getParameterList(){
+        return parameterList;
+    }
+    int getNumber(){
+        return numberOfParameters;
+    }
+    bool getDefinition(){
+        return defined;
+    }
+};
+
 class SymbolInfo
 {
     string name;
     string type;
     SymbolInfo *next;
-
+    FuncExtras *extra;
+    string line; // for parse tree
 public:
-    SymbolInfo(string name, string type, SymbolInfo *next = nullptr) : name(name), type(type), next(next) {}
-    ~SymbolInfo() { next = nullptr; }
+    SymbolInfo(string name, string type, SymbolInfo *next = nullptr, FuncExtras *extra = nullptr) : name(name), type(type), next(next), extra(extra) {}
+    ~SymbolInfo() { next = nullptr; if(extra!=nullptr) delete extra;}
     void setName(string name) { this->name = name; }
     string getName() { return name; }
     void setType(string type) { this->type = type; }
     string getType() { return type; }
     void setNext(SymbolInfo *ptr) { next = ptr; }
     SymbolInfo *getNext() { return next; }
+    bool isFunc(){
+        return extra!=nullptr;
+    }
+    FuncExtras* getExtra(){
+        return extra;
+    }
+    string getLine(){
+        return line;
+    }
+    void setLine(string line){
+        this->line = line;
+    }
 };
 
 class ScopeTable
@@ -29,6 +72,8 @@ class ScopeTable
     string id;
     int childCount;
     int suffix;
+    static int counter1;
+
 public:
     ScopeTable(int n, ScopeTable *parent = nullptr) : total_buckets(n), parentScope(parent)
     {
@@ -40,9 +85,11 @@ public:
         {
             parentScope->increaseChild();
             suffix = parentScope->getChildCount();
-            id = parentScope->getId() + "." + to_string(suffix);
+            id = to_string(++counter1);
         }
-        else{
+        else
+        {
+            counter1 = 1;
             suffix = 1;
             id = "1";
         }
@@ -57,12 +104,13 @@ public:
                 temp = iter;
                 iter = iter->getNext();
                 delete temp;
-                temp = nullptr; 
+                temp = nullptr;
             }
         }
-        delete []hashTable;
+        delete[] hashTable;
     }
-    int getSuffix(){
+    int getSuffix()
+    {
         return suffix;
     }
     unsigned long long hashSdbm(string str)
@@ -155,16 +203,18 @@ public:
         }
         return false;
     }
-    void print(FILE *out )
+    void print(FILE *out)
     {
-        fprintf(out,"\tScopeTable# %s\n",id.c_str());
+        fprintf(out, "\tScopeTable# %s\n", id.c_str());
         for (int i = 1; i <= total_buckets; i++)
         {
-            fprintf(out, "\t%d", i);
             SymbolInfo *iter = hashTable[i - 1];
+            if (iter == nullptr)
+                continue;
+            fprintf(out, "\t%d", i);
             while (iter != nullptr)
             {
-                fprintf(out," --> (%s,%s)", iter->getName().c_str(), iter->getType().c_str());
+                fprintf(out, " --> <%s,%s>", iter->getName().c_str(), iter->getType().c_str());
                 iter = iter->getNext();
             }
             fprintf(out, "\n");
@@ -218,8 +268,8 @@ public:
         SymbolInfo *temp = nullptr;
         while (iter != nullptr)
         {
-            temp =  iter->Lookup(name);
-            if(temp!= nullptr)
+            temp = iter->Lookup(name);
+            if (temp != nullptr)
                 return temp;
             iter = iter->getParentScope();
             temp = nullptr;
@@ -240,3 +290,54 @@ public:
         }
     }
 };
+
+class MyStack
+{
+    SymbolInfo *head;
+
+public:
+    MyStack()
+    {
+        head = nullptr;
+    }
+    ~MyStack()
+    {
+        cleanUp();
+    }
+    void push(SymbolInfo *s)
+    {
+        if (head == nullptr)
+        {
+            head = s;
+            return;
+        }
+        s->setNext(head);
+        head = s;
+    }
+    SymbolInfo *pop()
+    {
+        if (head == nullptr)
+            return nullptr;
+        SymbolInfo *temp = head;
+        head = head->getNext();
+        return temp;
+    }
+    void cleanUp()
+    {
+        SymbolInfo *iter = head, *temp = nullptr;
+        while (iter != nullptr)
+        {
+            temp = iter;
+            iter = iter->getNext();
+            delete temp;
+            temp = nullptr;
+        }
+        head = nullptr;
+    }
+    bool isEmpty()
+    {
+        return head == nullptr;
+    }
+};
+
+#endif

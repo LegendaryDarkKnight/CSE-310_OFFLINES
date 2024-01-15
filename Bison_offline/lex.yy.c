@@ -523,13 +523,12 @@ char *yytext;
 #include "y.tab.h"
 int line_count= 1;
 int err_count = 0;
-
 #define YYSTYPE SymbolInfo*
 extern YYSTYPE yylval;
 extern SymbolTable *table;
 extern FILE *logout;
+#line 531 "lex.yy.c"
 #line 532 "lex.yy.c"
-#line 533 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -746,10 +745,10 @@ YY_DECL
 		}
 
 	{
-#line 26 "2005033.l"
+#line 25 "2005033.l"
 
 
-#line 753 "lex.yy.c"
+#line 752 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -809,17 +808,17 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 28 "2005033.l"
+#line 27 "2005033.l"
 {line_count++; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 30 "2005033.l"
+#line 29 "2005033.l"
 {}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 32 "2005033.l"
+#line 31 "2005033.l"
 {
 			fprintf(logout,"Line# %d: Token <IF> Lexeme %s found\n",line_count,yytext);
 			return IF;
@@ -827,7 +826,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 37 "2005033.l"
+#line 36 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <ELSE> Lexeme %s found\n",line_count,yytext);
 			return ELSE;
@@ -835,7 +834,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 42 "2005033.l"
+#line 41 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <FOR> Lexeme %s found\n",line_count,yytext);
 			return FOR;
@@ -843,7 +842,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 47 "2005033.l"
+#line 46 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <WHILE> Lexeme %s found\n",line_count,yytext);
 			return WHILE;
@@ -851,7 +850,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 52 "2005033.l"
+#line 51 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <INT> Lexeme %s found\n",line_count,yytext);
 			return INT;
@@ -859,7 +858,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 57 "2005033.l"
+#line 56 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <FLOAT> Lexeme %s found\n",line_count,yytext);
 			return FLOAT;
@@ -867,7 +866,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 62 "2005033.l"
+#line 61 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <VOID> Lexeme %s found\n",line_count,yytext);
 			return VOID;
@@ -875,7 +874,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 67 "2005033.l"
+#line 66 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <RETURN> Lexeme %s found\n",line_count,yytext);
 			return RETURN;
@@ -883,7 +882,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 72 "2005033.l"
+#line 71 "2005033.l"
 {
 			fprintf(logout,"Line# %d: Token <PRINTLN> Lexeme %s found\n",line_count,yytext);
 			return PRINTLN;
@@ -891,7 +890,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 77 "2005033.l"
+#line 76 "2005033.l"
 {
 			string str(yytext);
 			SymbolInfo *s= new  SymbolInfo(str, "CONST_INT");
@@ -902,7 +901,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 85 "2005033.l"
+#line 84 "2005033.l"
 {
 			string str(yytext);
 			SymbolInfo *s= new  SymbolInfo(str, "CONST_FLOAT");
@@ -913,7 +912,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 93 "2005033.l"
+#line 92 "2005033.l"
 {	
 			err_count++;
 			fprintf(logout,"Error at line# %d: TOO_MANY_DECIMAL_POINTS %s\n",line_count,yytext);
@@ -921,7 +920,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 98 "2005033.l"
+#line 97 "2005033.l"
 {	
 			err_count++;
 			fprintf(logout,"Error at line# %d: ILLFORMED_NUMBER %s\n",line_count,yytext);
@@ -929,7 +928,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 103 "2005033.l"
+#line 102 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <INCOP> Lexeme %s found\n",line_count,yytext);
 			return INCOP;
@@ -937,7 +936,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 108 "2005033.l"
+#line 107 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <DECOP> Lexeme %s found\n",line_count,yytext);
 			return DECOP;
@@ -945,7 +944,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 113 "2005033.l"
+#line 112 "2005033.l"
 {
 			string str(yytext);
 			SymbolInfo *s= new  SymbolInfo(str, "ADDOP");
@@ -956,7 +955,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 121 "2005033.l"
+#line 120 "2005033.l"
 {	
 			string str(yytext);
 			SymbolInfo *s= new  SymbolInfo(str, "MULOP");
@@ -967,7 +966,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 129 "2005033.l"
+#line 128 "2005033.l"
 {	
 			string str(yytext);
 			SymbolInfo *s= new  SymbolInfo(str, "LOGICOP");
@@ -978,7 +977,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 137 "2005033.l"
+#line 136 "2005033.l"
 {
 			string str(yytext);
 			SymbolInfo *s= new  SymbolInfo(str, "RELOP");
@@ -989,7 +988,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 145 "2005033.l"
+#line 144 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <ASSIGNOP> Lexeme %s found\n",line_count,yytext);
 			return ASSIGNOP;
@@ -997,7 +996,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 150 "2005033.l"
+#line 149 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <NOT> Lexeme %s found\n",line_count,yytext);
 			return NOT;
@@ -1005,7 +1004,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 155 "2005033.l"
+#line 154 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <LPAREN> Lexeme %s found\n",line_count,yytext);
 			return LPAREN;
@@ -1013,7 +1012,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 160 "2005033.l"
+#line 159 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <RPAREN> Lexeme %s found\n",line_count,yytext);
 			return RPAREN;
@@ -1021,7 +1020,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 165 "2005033.l"
+#line 164 "2005033.l"
 {
 			table->EnterScope();
 			fprintf(logout,"Line# %d: Token <LCURL> Lexeme %s found\n",line_count,yytext);
@@ -1031,16 +1030,16 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 172 "2005033.l"
+#line 171 "2005033.l"
 {
-			table->ExitScope();
 			fprintf(logout,"Line# %d: Token <RCURL> Lexeme %s found\n",line_count,yytext);
+			
 			return RCURL;
 		}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 178 "2005033.l"
+#line 177 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <LSQUARE> Lexeme %s found\n",line_count,yytext);
 			return LTHIRD;
@@ -1048,7 +1047,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 183 "2005033.l"
+#line 182 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <RSQUARE> Lexeme %s found\n",line_count,yytext);
 			return RTHIRD;
@@ -1056,7 +1055,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 188 "2005033.l"
+#line 187 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <COMMA> Lexeme %s found\n",line_count,yytext);
 			return COMMA;
@@ -1064,7 +1063,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 193 "2005033.l"
+#line 192 "2005033.l"
 {	
 			fprintf(logout,"Line# %d: Token <SEMICOLON> Lexeme %s found\n",line_count,yytext);
 			return SEMICOLON;
@@ -1072,7 +1071,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 197 "2005033.l"
+#line 196 "2005033.l"
 {
 			string str(yytext);
 			SymbolInfo *s= table->Lookup(str);
@@ -1087,7 +1086,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 208 "2005033.l"
+#line 207 "2005033.l"
 {	
 			err_count++;
 			fprintf(logout,"Error at line# %d: INVALID_ID_SUFFIX_NUM_PREFIX %s\n",line_count,yytext);
@@ -1095,7 +1094,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 214 "2005033.l"
+#line 213 "2005033.l"
 {
 			err_count++;
 			fprintf(logout,"Error at line# %d: UNRECOGNIZED_CHAR %s\n",line_count,yytext);
@@ -1103,10 +1102,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 218 "2005033.l"
+#line 217 "2005033.l"
 ECHO;
 	YY_BREAK
-#line 1110 "lex.yy.c"
+#line 1109 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2111,7 +2110,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 218 "2005033.l"
+#line 217 "2005033.l"
 
 
 

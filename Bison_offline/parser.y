@@ -7,19 +7,27 @@
 #define YYSTYPE SymbolInfo*
 using namespace std;
 
+
+int ScopeTable::counter1 = 0;
 int yyparse(void);
 int yylex(void);
 extern FILE *yyin;
 extern int line_count;
 extern int err_count;
 
+bool infunc;
+MyStack stack1;
+
 FILE *fp;
 FILE *logout;
 FILE *errorout;
 FILE *parseout;
+FILE *checkerout;
 
 SymbolTable *table;
+SymbolInfo *temp;
 
+string type;
 void yyerror(char *s)
 {
 
@@ -48,7 +56,7 @@ program : program unit {
 		fprintf(logout,"program : program unit \n");
 	}
 	| unit{
-		
+		fprintf(logout,"program : unit \n");
 	}
 	;
 	
@@ -62,32 +70,45 @@ unit : var_declaration{
 		fprintf(logout,"unit : func_definition  \n");
 	 }
      ;
-     
+	
 func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
 			fprintf(logout,"func_declaration : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
+			temp = $2;
+			table->Insert(temp->getName(),"FUNCTION");
 		}
 		| type_specifier ID LPAREN RPAREN SEMICOLON{
 			fprintf(logout,"func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON \n");
+			temp = $2;
+			table->Insert(temp->getName(),"FUNCTION");
 		}
 		;
 		 
-func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement{
+func_definition : type_specifier ID LPAREN parameter_list RPAREN{infunc = true;} compound_statement{
 			fprintf(logout,"func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
+			temp = $2;
+			table->Insert(temp->getName(),"FUNCTION");
+			
 		}
 		| type_specifier ID LPAREN RPAREN compound_statement{
 			fprintf(logout,"func_definition : type_specifier ID LPAREN RPAREN compound_statement\n");
+			temp = $2;
+			table->Insert(temp->getName(),"FUNCTION");			
 		}
  		;				
 
 
 parameter_list  : parameter_list COMMA type_specifier ID{
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier ID\n");
+			temp = $4;
+			stack1.push(new SymbolInfo(temp->getName(), type));
 		}
 		| parameter_list COMMA type_specifier{
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier\n");
 		}
  		| type_specifier ID{
 			fprintf(logout,"parameter_list  : type_specifier ID\n");
+			temp = $2;
+			stack1.push(new SymbolInfo(temp->getName(), type));
 		}
 		| type_specifier{
 
@@ -95,11 +116,26 @@ parameter_list  : parameter_list COMMA type_specifier ID{
  		;
 
  		
-compound_statement : LCURL statements RCURL{
+compound_statement : LCURL{
+	if(infunc){
+		SymbolInfo *s;
+		while(!stack1.isEmpty()){
+			s = stack1.pop() ;
+			table->Insert(s->getName(),s->getType());
+			delete s;
+			s = nullptr;
+		}
+		infunc = false;
+	}
+} statements RCURL{
 				fprintf(logout,"compound_statement : LCURL statements RCURL  \n");
+				table->printAll(logout);
+				table->ExitScope();
 			}
  		    | LCURL RCURL{
 				fprintf(logout,"compound_statement : LCURL RCURL\n");
+				table->printAll(logout);
+				table->ExitScope();
 			}
  		    ;
  		    
@@ -108,22 +144,30 @@ var_declaration : type_specifier declaration_list SEMICOLON{
 		}
  		 ;
  		 
-type_specifier	: INT {fprintf(logout,"type_specifier : INT \n");}
- 		| FLOAT {fprintf(logout,"type_specifier : FLOAT \n");}
- 		| VOID {fprintf(logout,"type_specifier : VOID \n");}
+type_specifier	: INT {fprintf(logout,"type_specifier : INT \n"); type = "INT";}
+ 		| FLOAT {fprintf(logout,"type_specifier : FLOAT \n"); type = "FLOAT";}
+ 		| VOID {fprintf(logout,"type_specifier : VOID \n"); type = "VOID"; }
  		;
  		
 declaration_list : declaration_list COMMA ID{
 					fprintf(logout,"declaration_list : declaration_list COMMA ID \n");
+					temp = $3;
+					table->Insert(temp->getName(),type);
 					}
  		  | declaration_list COMMA ID LTHIRD CONST_INT RTHIRD{
 			fprintf(logout,"declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE \n");
+			temp = $3;
+			table->Insert(temp->getName(),type);
 			}
  		  | ID{
 			fprintf(logout,"declaration_list : ID \n");
+			temp = $1;
+			table->Insert(temp->getName(),type);
 		  }
  		  | ID LTHIRD CONST_INT RTHIRD{
 			fprintf(logout,"declaration_list : ID LSQUARE CONST_INT RSQUARE \n");
+			temp = $1;
+			table->Insert(temp->getName(),type);
 		  }
  		  ;
  		  
@@ -151,24 +195,24 @@ statement : var_declaration {
 			fprintf(logout,"statement : IF LPAREN expression RPAREN statement  \n");
 	  }
 	  | IF LPAREN expression RPAREN statement ELSE statement{
-			fprintf(logout,"IF LPAREN expression RPAREN statement ELSE statement  \n");
+			fprintf(logout,"statement : IF LPAREN expression RPAREN statement ELSE statement  \n");
 	  }
 	  | WHILE LPAREN expression RPAREN statement{
-			fprintf(logout,"WHILE LPAREN expression RPAREN statement  \n");
+			fprintf(logout,"statement : WHILE LPAREN expression RPAREN statement  \n");
 	  }
 	  | PRINTLN LPAREN ID RPAREN SEMICOLON{
-			fprintf(logout,"PRINTLN LPAREN ID RPAREN SEMICOLON  \n");
+			fprintf(logout,"statement : PRINTLN LPAREN ID RPAREN SEMICOLON  \n");
 	  }
 	  | RETURN expression SEMICOLON{
-			fprintf(logout,"RETURN expression SEMICOLON  \n");
+			fprintf(logout,"statement : RETURN expression SEMICOLON  \n");
 	  }
 	  ;
 	  
-expression_statement 	: SEMICOLON{
-
+expression_statement : SEMICOLON{
+				fprintf(logout,"expression_statement : SEMICOLON\n");
 			}			
 			| expression SEMICOLON{
-
+				fprintf(logout,"expression_statement : expression SEMICOLON\n");
 			} 
 			;
 	  
@@ -176,7 +220,7 @@ variable : ID{
 		fprintf(logout,"variable : ID 	 \n");
 	} 		
 	 | ID LTHIRD expression RTHIRD{
-		fprintf(logout,"declaration_list : ID LSQUARE CONST_INT RSQUARE \n");
+		fprintf(logout,"variable : ID LSQUARE expression RSQUARE  	 \n");
 	 } 
 	 ;
 	 
@@ -275,7 +319,7 @@ arguments : arguments COMMA logic_expression {
 %%
 int main(int argc,char *argv[])
 {
-
+	infunc = false;
 	if((fp=fopen(argv[1],"r"))==NULL)
 	{
 		printf("Cannot Open Input File.\n");
@@ -285,13 +329,14 @@ int main(int argc,char *argv[])
 	logout= fopen("log.txt","w");
 	errorout = fopen("error.txt", "w");
 	parseout = fopen("parsetree.txt","w");
+	checkerout = fopen("checker.txt", "w");
 
 	table = new SymbolTable(11);
 
 	yyin=fp;
 	yyparse();
 	
-	fprintf(logout,"Total lines: %d\nTotal errors: %d\n", line_count, err_count);
+	fprintf(logout,"Total lines: %d\nTotal errors: %d\n", line_count,err_count);
 	
 	delete table;
 	fclose(parseout);
