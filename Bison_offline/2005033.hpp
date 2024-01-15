@@ -4,7 +4,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <cstring>
-
+#include <vector>
+extern int line_count;
 using namespace std;
 
 class FuncExtras
@@ -18,7 +19,7 @@ public:
     FuncExtras(string returnType,string *parameterList,int numberOfParameters, bool defined):returnType(returnType), parameterList(parameterList), numberOfParameters(numberOfParameters),defined(defined)
     {}
     ~FuncExtras(){
-        delete parameterList;
+        if(parameterList!=nullptr)delete parameterList;
     }
     string getReturnType(){
         return returnType;
@@ -34,15 +35,68 @@ public:
     }
 };
 
+class ParseTree{
+    string type;
+    string line; // for parse tree
+    int startLine;
+    int endLine;
+    vector<ParseTree *> child;
+public:
+    ParseTree(string type, string line):type(type),line(line){
+        if(type=="") startLine = line_count;
+    }
+    string getLine(){
+        return line;
+    }
+    void setLine(string line){
+        this->line = line;
+    }
+    int getStartLine(){
+        return startLine;
+    }
+    void setStartLine(int line){
+        startLine = line;
+    }
+    int getEndLine(){
+        return endLine;
+    }
+    void setEndLine(int line){
+        endLine = line;
+    }
+    void addChild(ParseTree *s){
+        child.push_back(s);
+    }
+    void printTree(ParseTree *s, int level, FILE *out){
+        if(s==nullptr) return;
+        for(int i=0; i<level; i++)
+            fprintf(out, " ");
+        fprintf(out, "%s\t<Line: %d", s->line.c_str(), s->startLine);
+        if(s->type==""){
+            fprintf(out, ">\n");
+        }
+        else{
+            fprintf(out,"-%d>\n",s->endLine);
+        }
+        for(auto v: s->child){
+            printTree(v,level+1,out);
+        }
+
+    }
+    int getChildCount(){
+        return child.size();
+    }
+};
+
 class SymbolInfo
 {
     string name;
     string type;
     SymbolInfo *next;
     FuncExtras *extra;
-    string line; // for parse tree
+    
 public:
-    SymbolInfo(string name, string type, SymbolInfo *next = nullptr, FuncExtras *extra = nullptr) : name(name), type(type), next(next), extra(extra) {}
+    SymbolInfo(string name, string type, SymbolInfo *next = nullptr, FuncExtras *extra = nullptr) : name(name), type(type), next(next), extra(extra) {
+    }
     ~SymbolInfo() { next = nullptr; if(extra!=nullptr) delete extra;}
     void setName(string name) { this->name = name; }
     string getName() { return name; }
@@ -56,13 +110,9 @@ public:
     FuncExtras* getExtra(){
         return extra;
     }
-    string getLine(){
-        return line;
-    }
-    void setLine(string line){
-        this->line = line;
-    }
+    
 };
+
 
 class ScopeTable
 {

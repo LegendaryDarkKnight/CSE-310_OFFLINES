@@ -30,5 +30,17 @@
 #define INCOP 283
 #define DECOP 284
 #define LOWER_THAN_ELSE 285
+#ifdef YYSTYPE
+#undef  YYSTYPE_IS_DECLARED
+#define YYSTYPE_IS_DECLARED 1
+#endif
+#ifndef YYSTYPE_IS_DECLARED
+#define YYSTYPE_IS_DECLARED 1
+typedef union YYSTYPE {
+	SymbolInfo* symbolInfo;
+	ParseTree* parseTree;
+} YYSTYPE;
+#endif /* !YYSTYPE_IS_DECLARED */
+extern YYSTYPE yylval;
 
 #endif /* _yy_defines_h_ */

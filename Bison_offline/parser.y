@@ -4,9 +4,7 @@
 #include<cstdlib>
 #include<cstring>
 #include<cmath>
-#define YYSTYPE SymbolInfo*
 using namespace std;
-
 
 int ScopeTable::counter1 = 0;
 int yyparse(void);
@@ -14,7 +12,7 @@ int yylex(void);
 extern FILE *yyin;
 extern int line_count;
 extern int err_count;
-
+extern int start_line;
 bool infunc;
 MyStack stack1;
 
@@ -33,285 +31,602 @@ void yyerror(char *s)
 
 }
 
-%}
+ParseTree* setLeft(string type, string line){
+	return new ParseTree(type,line);
+}
 
-%token IF ELSE FOR WHILE ID LPAREN RPAREN SEMICOLON LCURL RCURL COMMA INT FLOAT VOID LTHIRD CONST_INT RTHIRD PRINTLN RETURN
-ASSIGNOP LOGICOP RELOP ADDOP MULOP CONST_FLOAT NOT INCOP DECOP
+ParseTree* symbolToParse(SymbolInfo *s){
+	return new ParseTree("", s->getType()+" : "+s->getName());
+}
 
-%left 
-%right
-
-%nonassoc LOWER_THAN_ELSE
-%nonassoc ELSE
-
-%%
-
-start : program
+void insertParameters(){
 	{
-		fprintf(logout,"start : program \n");
-	}
-	;
-
-program : program unit {
-		fprintf(logout,"program : program unit \n");
-	}
-	| unit{
-		fprintf(logout,"program : unit \n");
-	}
-	;
-	
-unit : var_declaration{
-		fprintf(logout,"unit : var_declaration  \n");
-	}
-     | func_declaration{
-		fprintf(logout,"unit : func_declaration  \n");
-	 }
-     | func_definition{
-		fprintf(logout,"unit : func_definition  \n");
-	 }
-     ;
-	
-func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
-			fprintf(logout,"func_declaration : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
-			temp = $2;
-			table->Insert(temp->getName(),"FUNCTION");
-		}
-		| type_specifier ID LPAREN RPAREN SEMICOLON{
-			fprintf(logout,"func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON \n");
-			temp = $2;
-			table->Insert(temp->getName(),"FUNCTION");
-		}
-		;
-		 
-func_definition : type_specifier ID LPAREN parameter_list RPAREN{infunc = true;} compound_statement{
-			fprintf(logout,"func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
-			temp = $2;
-			table->Insert(temp->getName(),"FUNCTION");
-			
-		}
-		| type_specifier ID LPAREN RPAREN compound_statement{
-			fprintf(logout,"func_definition : type_specifier ID LPAREN RPAREN compound_statement\n");
-			temp = $2;
-			table->Insert(temp->getName(),"FUNCTION");			
-		}
- 		;				
-
-
-parameter_list  : parameter_list COMMA type_specifier ID{
-			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier ID\n");
-			temp = $4;
-			stack1.push(new SymbolInfo(temp->getName(), type));
-		}
-		| parameter_list COMMA type_specifier{
-			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier\n");
-		}
- 		| type_specifier ID{
-			fprintf(logout,"parameter_list  : type_specifier ID\n");
-			temp = $2;
-			stack1.push(new SymbolInfo(temp->getName(), type));
-		}
-		| type_specifier{
-
-		}
- 		;
-
- 		
-compound_statement : LCURL{
 	if(infunc){
 		SymbolInfo *s;
 		while(!stack1.isEmpty()){
 			s = stack1.pop() ;
 			table->Insert(s->getName(),s->getType());
-			delete s;
+			// delete s;
 			s = nullptr;
 		}
 		infunc = false;
 	}
-} statements RCURL{
+}
+}
+%}
+
+%union {
+	SymbolInfo* symbolInfo;
+	ParseTree* parseTree;
+}
+
+%token <symbolInfo> IF ELSE FOR WHILE ID LPAREN RPAREN SEMICOLON LCURL RCURL COMMA INT FLOAT VOID LTHIRD CONST_INT RTHIRD PRINTLN RETURN
+ASSIGNOP LOGICOP RELOP ADDOP MULOP CONST_FLOAT NOT INCOP DECOP
+
+
+
+%nonassoc LOWER_THAN_ELSE
+%nonassoc ELSE
+%error-verbose 
+
+%destructor {
+	if($$!=nullptr){
+		delete $$;
+		$$ = nullptr;
+	}
+} <parseTree>
+
+%type <parseTree> start program unit var_declaration func_declaration func_definition type_specifier parameter_list compound_statement statements declaration_list statement expression expression_statement logic_expression rel_expression simple_expression term unary_expression factor variable argument_list arguments
+%left 
+%right
+%%
+
+
+start : program
+	{
+		fprintf(logout,"start : program \n");
+		$$ = setLeft("start","start : program");
+		$$->addChild($1);
+		$$->setEndLine(line_count);
+		$$->setStartLine($1->getStartLine());
+		$$->printTree($$,0,parseout);
+	}
+	;
+
+program : program unit {
+		fprintf(logout,"program : program unit \n");
+		$$ = setLeft("program","program : program unit");
+		$$->addChild($1); 
+		$$->addChild($2); 
+		$$->setStartLine($1->getStartLine());
+		$$->setEndLine(line_count);
+
+	}
+	| unit{
+		fprintf(logout,"program : unit \n");
+		$$ = setLeft("program","program : unit");
+		$$->addChild($1);
+		$$->setStartLine($1->getStartLine());
+		$$->setEndLine(line_count);
+	}
+	;
+	
+unit : var_declaration{
+		fprintf(logout,"unit : var_declaration  \n");
+		$$ = setLeft("unit","unit : var_declaration");
+		$$->addChild($1);
+		$$->setStartLine($1->getStartLine());
+		$$->setEndLine(line_count);
+	}
+     | func_declaration{
+		fprintf(logout,"unit : func_declaration  \n");
+		$$ = setLeft("unit","unit : func_declaration");
+		$$->addChild($1);
+		$$->setStartLine($1->getStartLine());
+		$$->setEndLine(line_count);
+	 }
+     | func_definition{
+		fprintf(logout,"unit : func_definition  \n");
+		$$ = setLeft("unit","unit : func_definition");
+		$$->addChild($1);
+		$$->setStartLine($1->getStartLine());
+		$$->setEndLine(line_count);
+	 }
+     ;
+	
+func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
+			$$ = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON");
+			fprintf(logout,"func_declaration : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
+			temp = $2;
+			table->Insert(temp->getName(),"FUNCTION");
+			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(new ParseTree("","LPAREN : ("));
+			$$->addChild($4); $$->addChild(new ParseTree("","RPAREN : )")); $$->addChild(new ParseTree("","SEMICOLON : ;"));
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+			infunc = false;
+			stack1.cleanUp();
+		}
+		| type_specifier ID LPAREN RPAREN SEMICOLON{
+			$$ = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON");
+			fprintf(logout,"func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON \n");
+			temp = $2;
+			table->Insert(temp->getName(),"FUNCTION");
+			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(new ParseTree("","LPAREN : ("));
+			$$->addChild(new ParseTree("","RPAREN : )")); $$->addChild(new ParseTree("","SEMICOLON : ;"));
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+		}
+		;
+		 
+func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement{
+			$$ = setLeft("func_definition","func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement ");
+			fprintf(logout,"func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
+			temp = $2;
+			table->Insert(temp->getName(),"FUNCTION");
+			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(new ParseTree("","LPAREN : ("));
+			$$->addChild($4); $$->addChild(new ParseTree("","RPAREN : )")); $$->addChild($6);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);	
+		}
+		| type_specifier ID LPAREN RPAREN compound_statement{
+			$$ = setLeft("func_definition","func_definition : type_specifier ID LPAREN RPAREN compound_statement ");
+			fprintf(logout,"func_definition : type_specifier ID LPAREN RPAREN compound_statement\n");
+			temp = $2;
+			table->Insert(temp->getName(),"FUNCTION");
+			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(new ParseTree("","LPAREN : ("));
+			$$->addChild(new ParseTree("","RPAREN : )")); $$->addChild($5);		
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+		}
+ 		;				
+
+
+parameter_list  : parameter_list COMMA type_specifier ID{
+			infunc = true;
+			$$ = setLeft("parameter_list","parameter_list : parameter_list COMMA type_specifier ID");
+			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier ID\n");
+			temp = $4;
+			stack1.push(new SymbolInfo(temp->getName(), type));
+			$$->addChild($1); $$->addChild(new ParseTree("","COMMA : ,"));
+			$$->addChild($3); $$->addChild(symbolToParse($4));
+			$$->setStartLine($1->getStartLine());	
+			$$->setEndLine(line_count);
+		}
+		| parameter_list COMMA type_specifier{
+			$$ = setLeft("parameter_list", "parameter_list : parameter_list COMMA type_specifier");
+			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier\n");
+			$$->addChild($1); $$->addChild(new ParseTree("","COMMA : ,")); $$->addChild($3);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+		}
+ 		| type_specifier ID{
+			infunc = true;
+			$$ = setLeft("parameter_list","parameter_list  : type_specifier ID");
+			fprintf(logout,"parameter_list  : type_specifier ID\n");
+			temp = $2;
+			stack1.push(new SymbolInfo(temp->getName(), type));
+			$$->addChild($1); $$->addChild(symbolToParse($2));
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+		}
+		| type_specifier{
+			$$ = setLeft("parameter_list","parameter_list  : type_specifier");
+			fprintf(logout,"parameter_list  : type_specifier\n");
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+		}
+ 		;
+
+ 		
+compound_statement : LCURL statements RCURL{
+				$$ = setLeft("compound_statement","compound_statement : LCURL statements RCURL");
+				if($$ == nullptr)
+				cout<<"Null ";
 				fprintf(logout,"compound_statement : LCURL statements RCURL  \n");
 				table->printAll(logout);
 				table->ExitScope();
+				$$->addChild(new ParseTree("","LCURL : {")); $$->addChild($2); $$->addChild(new ParseTree("","RCURL : }"));
+				$$->setStartLine(start_line);
+				$$->setEndLine(line_count);		
 			}
  		    | LCURL RCURL{
-				fprintf(logout,"compound_statement : LCURL RCURL\n");
+				$$ = setLeft("compound_statement","compound_statement : LCURL RCURL");
+				fprintf(logout,"compound_statement : LCURL RCURL  \n");
 				table->printAll(logout);
 				table->ExitScope();
+				$$->addChild(new ParseTree("","LCURL : {")); $$->addChild(new ParseTree("","RCURL : }"));
+				$$->setStartLine(start_line);
+				$$->setEndLine(line_count);
 			}
  		    ;
  		    
 var_declaration : type_specifier declaration_list SEMICOLON{
+		$$ = setLeft("var_declaration","var_declaration : type_specifier declaration_list SEMICOLON");
 		fprintf(logout,"var_declaration : type_specifier declaration_list SEMICOLON  \n");
+		$$->addChild($1); $$->addChild($2); $$->addChild(new ParseTree("","SEMICOLON : ;")); 
+		$$->setStartLine($1->getStartLine());
+		$$->setEndLine(line_count);
 		}
  		 ;
  		 
-type_specifier	: INT {fprintf(logout,"type_specifier : INT \n"); type = "INT";}
- 		| FLOAT {fprintf(logout,"type_specifier : FLOAT \n"); type = "FLOAT";}
- 		| VOID {fprintf(logout,"type_specifier : VOID \n"); type = "VOID"; }
+type_specifier	: INT {
+		$$ = setLeft("type_specifier", "type_specifier : INT");fprintf(logout,"type_specifier : INT \n"); type = "INT"; 
+		$$->addChild(new ParseTree("","INT : int")); 
+		$$->setStartLine(start_line);
+		$$->setEndLine(line_count);
+		}
+ 		| FLOAT {
+		$$ = setLeft("type_specifier", "type_specifier : FLOAT");fprintf(logout,"type_specifier : FLOAT \n"); type = "FLOAT"; 
+		$$->addChild(new ParseTree("","FLOAT : float")); 
+		$$->setStartLine(start_line);
+		$$->setEndLine(line_count);
+		}
+ 		| VOID {
+		$$ = setLeft("type_specifier", "type_specifier : VOID");fprintf(logout,"type_specifier : VOID \n"); type = "VOID"; 
+		$$->addChild(new ParseTree("","VOID : void")); 
+		$$->setStartLine(start_line);
+		$$->setEndLine(line_count);
+		}
  		;
  		
 declaration_list : declaration_list COMMA ID{
-					fprintf(logout,"declaration_list : declaration_list COMMA ID \n");
-					temp = $3;
-					table->Insert(temp->getName(),type);
-					}
- 		  | declaration_list COMMA ID LTHIRD CONST_INT RTHIRD{
-			fprintf(logout,"declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE \n");
-			temp = $3;
-			table->Insert(temp->getName(),type);
-			}
- 		  | ID{
-			fprintf(logout,"declaration_list : ID \n");
-			temp = $1;
-			table->Insert(temp->getName(),type);
-		  }
- 		  | ID LTHIRD CONST_INT RTHIRD{
-			fprintf(logout,"declaration_list : ID LSQUARE CONST_INT RSQUARE \n");
-			temp = $1;
-			table->Insert(temp->getName(),type);
+				$$=setLeft("declaration_list","declaration_list : declaration_list COMMA ID");
+				fprintf(logout,"declaration_list : declaration_list COMMA ID \n");
+				temp = $3;
+				table->Insert(temp->getName(),type);
+				$$->addChild($1); $$->addChild(new ParseTree("","COMMA : ,")); $$->addChild(symbolToParse($3));
+				$$->setStartLine($1->getStartLine());
+				$$->setEndLine(line_count);
+				}
+ 		  		| declaration_list COMMA ID LTHIRD CONST_INT RTHIRD{
+				$$=setLeft("declaration_list","declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE");
+				fprintf(logout,"declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE \n");
+				temp = $3;
+				table->Insert(temp->getName(),type);
+				$$->addChild($1); $$->addChild(new ParseTree("","COMMA : ,")); $$->addChild(symbolToParse($3));
+				$$->addChild(new ParseTree("","LTHIRD : [")); $$->addChild(symbolToParse($5)); $$->addChild(new ParseTree("","RTHIRD : ]")); 
+				$$->setStartLine($1->getStartLine());
+				$$->setEndLine(line_count);
+				}
+ 		  		| ID{
+				$$=setLeft("declaration_list", "declaration_list : ID");
+				fprintf(logout,"declaration_list : ID \n");
+				temp = $1;
+				table->Insert(temp->getName(),type);
+				$$->addChild(symbolToParse($1));
+				$$->setStartLine(start_line);
+				$$->setEndLine(line_count);
+		  		}
+ 		  		| ID LTHIRD CONST_INT RTHIRD{
+				$$=setLeft("declaration_list","declaration_list : ID LSQUARE CONST_INT RSQUARE");
+				fprintf(logout,"declaration_list : ID LSQUARE CONST_INT RSQUARE \n");
+				temp = $1;
+				table->Insert(temp->getName(),type);
+				$$->addChild(symbolToParse($1)); $$->addChild(new ParseTree("","LTHIRD : [")); $$->addChild(symbolToParse($2)); $$->addChild(new ParseTree("","RTHIRD : ]"));
+				$$->setStartLine(start_line);
+				$$->setEndLine(line_count);
 		  }
  		  ;
  		  
 statements : statement{
-			fprintf(logout,"statements : statement  \n");
+		$$=setLeft("statements","statements : statement");
+		fprintf(logout,"statements : statement  \n");
+		$$->addChild($1);
+		$$->setStartLine($1->getStartLine());
+		$$->setEndLine(line_count);
+		insertParameters();
 		}
 	   | statements statement{
-			fprintf(logout,"statements : statements statement  \n");
+		$$=setLeft("statements","statements : statements statement");
+		fprintf(logout,"statements : statements statement  \n");
+		$$->addChild($1); $$->addChild($2);
+		$$->setStartLine($1->getStartLine());
+		$$->setEndLine(line_count);
+		insertParameters();
 	   }
 	   ;
 	   
 statement : var_declaration {
+			$$=setLeft("statement","statement : var_declaration");
 			fprintf(logout,"statement : var_declaration \n");
-		}
-	  | expression_statement{
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+			}
+	  		| expression_statement{
+			$$=setLeft("statement","statement : expression_statement");
 			fprintf(logout,"statement : expression_statement  \n");
-	  }
-	  | compound_statement{
-			
-	  }
-	  | FOR LPAREN expression_statement expression_statement expression RPAREN statement{
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+	  		}
+	  		| compound_statement{
+			$$=setLeft("statement","statement : compound_statement");
+			fprintf(logout,"statement : compound_statement  \n");
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+	  		}
+	  		| FOR LPAREN expression_statement expression_statement expression RPAREN statement{
+			$$=setLeft("statement","statement : FOR LPAREN expression_statement expression_statement expression RPAREN statement");
 			fprintf(logout,"statement : FOR LPAREN expression_statement expression_statement expression RPAREN statement  \n");
-	  }
-	  | IF LPAREN expression RPAREN statement %prec LOWER_THAN_ELSE ;{
+			$$->addChild(new ParseTree("","FOR : for")); $$->addChild(new ParseTree("","LPAREN : (")); $$->addChild($3);
+			$$->addChild($4); $$->addChild($5); $$->addChild(new ParseTree("","RPAREN : )")); $$->addChild($7);
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+	  		}
+	  		| IF LPAREN expression RPAREN statement %prec LOWER_THAN_ELSE ;{
+			$$=setLeft("statement","statement : IF LPAREN expression RPAREN statement");
 			fprintf(logout,"statement : IF LPAREN expression RPAREN statement  \n");
-	  }
-	  | IF LPAREN expression RPAREN statement ELSE statement{
+			$$->addChild(new ParseTree("","IF : if")); $$->addChild(new ParseTree("","LPAREN : (")); $$->addChild($3);
+			$$->addChild(new ParseTree("","RPAREN : )")); $$->addChild($5);
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+	  		}
+	  		| IF LPAREN expression RPAREN statement ELSE statement{
+			$$=setLeft("statement","statement : IF LPAREN expression RPAREN statement ELSE statement");
 			fprintf(logout,"statement : IF LPAREN expression RPAREN statement ELSE statement  \n");
-	  }
-	  | WHILE LPAREN expression RPAREN statement{
+			$$->addChild(new ParseTree("","IF : if")); $$->addChild(new ParseTree("","LPAREN : (")); $$->addChild($3);
+			$$->addChild(new ParseTree("","RPAREN : )")); $$->addChild($5); $$->addChild(new ParseTree("","ELSE : else")); $$->addChild($7);
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+	  		}
+	  		| WHILE LPAREN expression RPAREN statement{
+			$$=setLeft("statement","statement : WHILE LPAREN expression RPAREN statement");
 			fprintf(logout,"statement : WHILE LPAREN expression RPAREN statement  \n");
-	  }
-	  | PRINTLN LPAREN ID RPAREN SEMICOLON{
+			$$->addChild(new ParseTree("","WHILE : while")); $$->addChild(new ParseTree("","LPAREN : (")); $$->addChild($3);
+			$$->addChild(new ParseTree("","RPAREN : )")); $$->addChild($5);
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+
+	  		}
+	  		| PRINTLN LPAREN ID RPAREN SEMICOLON{
+			$$=setLeft("statement","statement : PRINTLN LPAREN ID RPAREN SEMICOLON");			
 			fprintf(logout,"statement : PRINTLN LPAREN ID RPAREN SEMICOLON  \n");
-	  }
-	  | RETURN expression SEMICOLON{
+			$$->addChild(new ParseTree("","PRINTLN : println")); $$->addChild(new ParseTree("","LPAREN : (")); $$->addChild(symbolToParse($3));
+			$$->addChild(new ParseTree("","RPAREN : )")); $$->addChild(new ParseTree("","SEMICOLON : ;"));
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+
+	  		}
+	  		| RETURN expression SEMICOLON{
+			$$=setLeft("statement","statement : RETURN expression SEMICOLON");
 			fprintf(logout,"statement : RETURN expression SEMICOLON  \n");
-	  }
-	  ;
+			$$->addChild(new ParseTree("","RETURN : return")); $$->addChild($2); $$->addChild(new ParseTree("","SEMICOLON : ;"));
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+
+	  		}
+			;
 	  
 expression_statement : SEMICOLON{
-				fprintf(logout,"expression_statement : SEMICOLON\n");
+			$$=setLeft("expression_statement","expression_statement : SEMICOLON");
+			fprintf(logout,"expression_statement : SEMICOLON\n");
+			$$->addChild(new ParseTree("","SEMICOLON : ;"));
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
 			}			
 			| expression SEMICOLON{
-				fprintf(logout,"expression_statement : expression SEMICOLON\n");
+			$$=setLeft("expression_statement","expression_statement : expression SEMICOLON");
+			fprintf(logout,"expression_statement : expression SEMICOLON\n");
+			$$->addChild($1); $$->addChild(new ParseTree("","SEMICOLON : ;"));
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
 			} 
 			;
 	  
 variable : ID{
+		$$=setLeft("variable","variable : ID");
 		fprintf(logout,"variable : ID 	 \n");
-	} 		
-	 | ID LTHIRD expression RTHIRD{
+		$$->addChild(symbolToParse($1));
+		$$->setStartLine(start_line);
+		$$->setEndLine(line_count);
+		} 		
+	 	| ID LTHIRD expression RTHIRD{
+		$$=setLeft("variable","variable : ID LSQUARE expression RSQUARE");
 		fprintf(logout,"variable : ID LSQUARE expression RSQUARE  	 \n");
+		$$->addChild(symbolToParse($1)); $$->addChild(new ParseTree("","LTHIRD : [")); $$->addChild($3); $$->addChild(new ParseTree("","RTHIRD : ]"));
+		$$->setStartLine(start_line);
+		$$->setEndLine(line_count);
 	 } 
 	 ;
 	 
 expression : logic_expression{
+			$$=setLeft("expression","expression 	: logic_expression");
 			fprintf(logout,"expression 	: logic_expression	 \n");
-	 	}
-	   | variable ASSIGNOP logic_expression{
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+	 		}
+	   		| variable ASSIGNOP logic_expression{
+			$$=setLeft("expression","expression 	: variable ASSIGNOP logic_expression");
 			fprintf(logout,"expression 	: variable ASSIGNOP logic_expression 		 \n");
-	   }	
-	   ;
+			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+	   		}	
+	   		;
 			
 logic_expression : rel_expression 	{
+			$$=setLeft("logic_expression","logic_expression : rel_expression");
 			fprintf(logout,"logic_expression : rel_expression 	 \n");
-		}
-		 | rel_expression LOGICOP rel_expression {
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+			}
+			 | rel_expression LOGICOP rel_expression {
+			$$=setLeft("logic_expression","logic_expression : rel_expression LOGICOP rel_expression");
 			fprintf(logout,"logic_expression : rel_expression LOGICOP rel_expression 	 	 \n");
-		 }
-		 ;
+			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+		 	}
+		 	;
 			
 rel_expression	: simple_expression {
-		fprintf(logout,"rel_expression	: simple_expression \n");
-		}
-		| simple_expression RELOP simple_expression	{
-		fprintf(logout,"rel_expression	: simple_expression RELOP simple_expression	\n");
-
+			$$=setLeft("rel_expression","rel_expression	: simple_expression");
+			fprintf(logout,"rel_expression	: simple_expression \n");
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+			}
+			| simple_expression RELOP simple_expression	{
+			$$=setLeft("rel_expression","rel_expression	: simple_expression RELOP simple_expression");
+			fprintf(logout,"rel_expression	: simple_expression RELOP simple_expression	\n");
+			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
 		}
 		;
 				
 simple_expression : term {
-		fprintf(logout,"simple_expression : term \n");
-
-		}
-		  | simple_expression ADDOP term {
-		fprintf(logout,"simple_expression :	simple_expression ADDOP term \n");
-
+			$$=setLeft("simple_expression","simple_expression : term");
+			fprintf(logout,"simple_expression : term \n");
+			$$->addChild($1);
+			$$->setEndLine(line_count);
+			}	
+		  	| simple_expression ADDOP term {
+			$$=setLeft("simple_expression","simple_expression :	simple_expression ADDOP term");
+			fprintf(logout,"simple_expression :	simple_expression ADDOP term \n");
+			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
 		  }
 		  ;
 					
 term :	unary_expression {
-		fprintf(logout,"term :	unary_expression \n");
-	}
-     |  term MULOP unary_expression {
-		fprintf(logout,"term : term MULOP unary_expression \n");
+			$$=setLeft("term","term :	unary_expression");
+			fprintf(logout,"term :	unary_expression \n");
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+
+			}
+     		|  term MULOP unary_expression {
+			$$=setLeft("term","term : term MULOP unary_expression");
+			fprintf(logout,"term : term MULOP unary_expression \n");
+			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
 	 }
      ;
 
 unary_expression : ADDOP unary_expression  {
-			fprintf(logout,"factor : variable  \n");
-		}
-		 | NOT unary_expression {
+			$$=setLeft("unary_expression","unary_expression : ADDOP unary_expression");
+			fprintf(logout,"unary_expression : ADDOP unary_expression  \n");
+			$$->addChild(symbolToParse($1)); $$->addChild($2);
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+
+			}
+		 	| NOT unary_expression {
+			$$=setLeft("unary_expression","unary_expression : NOT unary_expression");
 			fprintf(logout,"unary_expression : NOT unary_expression \n");
-		 }
-		 | factor {
+			$$->addChild(symbolToParse($1)); $$->addChild($2);
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+
+		 	}
+		 	| factor {
+			$$=setLeft("unary_expression","unary_expression : factor");
 			fprintf(logout,"unary_expression : factor \n");
-		 } 
-		 ;
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+
+		 	} 
+		 	;
 	
 factor	: variable {
-	fprintf(logout,"factor : variable  \n");
-	}
-	| ID LPAREN argument_list RPAREN {
-		fprintf(logout,"factor	: ID LPAREN argument_list RPAREN  \n");
-	}
-	| LPAREN expression RPAREN {
-		fprintf(logout,"factor	: LPAREN expression RPAREN   \n");
-	}
-	| CONST_INT {
-		fprintf(logout,"factor	: CONST_INT   \n");
-	}
-	| CONST_FLOAT {
-		fprintf(logout,"factor	: CONST_FLOAT   \n");
-	}
-	| variable INCOP {
-		fprintf(logout,"factor	: variable INCOP  \n");
-	}
-	| variable DECOP {
-		fprintf(logout,"factor	: variable DECOP  \n");
-	}
-	;
+			$$=setLeft("factor","factor : variable");
+			fprintf(logout,"factor : variable  \n");
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+
+			}
+			| ID LPAREN argument_list RPAREN {
+			$$=setLeft("factor","factor	: ID LPAREN argument_list RPAREN");
+			fprintf(logout,"factor	: ID LPAREN argument_list RPAREN  \n");
+			$$->addChild(symbolToParse($1)); $$->addChild(new ParseTree("","LPAREN : (")); $$->addChild($3); $$->addChild(new ParseTree("","RPAREN : )"));
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+			}
+			| LPAREN expression RPAREN {
+			$$=setLeft("factor","factor	: LPAREN expression RPAREN");
+			fprintf(logout,"factor	: LPAREN expression RPAREN   \n");
+			$$->addChild(new ParseTree("","LPAREN : (")); $$->addChild($2); $$->addChild(new ParseTree("","RPAREN : )"));
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+			}
+			| CONST_INT {
+			$$=setLeft("factor","factor	: CONST_INT");
+			fprintf(logout,"factor	: CONST_INT   \n");
+			$$->addChild(symbolToParse($1));
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+
+			}
+			| CONST_FLOAT {
+			$$=setLeft("factor","factor	: CONST_FLOAT");
+			fprintf(logout,"factor	: CONST_FLOAT   \n");
+			$$->addChild(symbolToParse($1));
+			$$->setStartLine(start_line);
+			$$->setEndLine(line_count);
+
+			}
+			| variable INCOP {
+			$$=setLeft("factor","factor	: variable INCOP");
+			fprintf(logout,"factor	: variable INCOP  \n");
+			$$->addChild($1); $$->addChild(symbolToParse($2));
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+
+			}
+			| variable DECOP {
+			$$=setLeft("factor","factor	: variable DECOP");
+			fprintf(logout,"factor	: variable DECOP  \n");
+			$$->addChild($1); $$->addChild(symbolToParse($2));
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+
+			}
+			;
 	
 argument_list : arguments{
+			$$=setLeft("argument_list","argument_list : arguments");
 			fprintf(logout,"argument_list : arguments  \n");
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+
 			}
-			  |
-			  ;
+			  | {
+			$$=setLeft("argument_list","argument_list :");
+			fprintf(logout,"argument_list :\n");
+			$$->addChild(new ParseTree("",""));
+			$$->setStartLine(line_count);
+			$$->setEndLine(line_count);
+
+			}
+			;
 	
 arguments : arguments COMMA logic_expression {
+			$$=setLeft("arguments","arguments : arguments COMMA logic_expression");
 			fprintf(logout,"arguments : arguments COMMA logic_expression \n");
+			$$->addChild($1); $$->addChild(new ParseTree("","COMMA : ,")); $$->addChild($3);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+
 			}
 	      | logic_expression {
+			$$=setLeft("arguments","arguments : logic_expression");
 			fprintf(logout,"arguments : logic_expression\n");
+			$$->addChild($1);
+			$$->setStartLine($1->getStartLine());
+			$$->setEndLine(line_count);
+
 		  }
 	      ;
  
@@ -339,6 +654,7 @@ int main(int argc,char *argv[])
 	fprintf(logout,"Total lines: %d\nTotal errors: %d\n", line_count,err_count);
 	
 	delete table;
+	fclose(checkerout);
 	fclose(parseout);
 	fclose(errorout);
 	fclose(logout);
