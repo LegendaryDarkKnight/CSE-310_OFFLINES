@@ -8,27 +8,33 @@
 extern int line_count;
 using namespace std;
 
+class Pair{
+    string name;
+    string type;
+public:
+    Pair(string name, string type):name(name),type(type){}
+    string getName(){return name;}
+    string getType(){return type;}
+};
+
 class FuncExtras
 {
     string returnType;
-    string *parameterList;
-    int numberOfParameters;
+    vector<Pair *> parameterList;
+
     bool defined;
 
 public:
-    FuncExtras(string returnType,string *parameterList,int numberOfParameters, bool defined):returnType(returnType), parameterList(parameterList), numberOfParameters(numberOfParameters),defined(defined)
+    FuncExtras(string returnType,vector<Pair *> parameterList, bool defined):returnType(returnType), parameterList(parameterList), defined(defined)
     {}
-    ~FuncExtras(){
-        if(parameterList!=nullptr)delete parameterList;
-    }
     string getReturnType(){
         return returnType;
     }
-    string* getParameterList(){
+    vector<Pair *> getParameterList(){
         return parameterList;
     }
     int getNumber(){
-        return numberOfParameters;
+        return parameterList.size();
     }
     bool getDefinition(){
         return defined;
@@ -42,11 +48,14 @@ class ParseTree{
     int endLine;
     vector<ParseTree *> child;
 public:
-    ParseTree(string type, string line):type(type),line(line){
-        if(type=="") startLine = line_count;
+    ParseTree(string type, string line, int startLine = line_count, int endLine=line_count):type(type),line(line),startLine(startLine),endLine(endLine){
+
     }
     string getLine(){
         return line;
+    }
+    string getType(){
+        return type;
     }
     void setLine(string line){
         this->line = line;
@@ -54,11 +63,11 @@ public:
     int getStartLine(){
         return startLine;
     }
-    void setStartLine(int line){
-        startLine = line;
-    }
     int getEndLine(){
         return endLine;
+    }
+    void setStartLine(int line){
+        startLine = line;
     }
     void setEndLine(int line){
         endLine = line;
@@ -93,9 +102,10 @@ class SymbolInfo
     string type;
     SymbolInfo *next;
     FuncExtras *extra;
-    
+    int line;
+    bool array1 = false;    
 public:
-    SymbolInfo(string name, string type, SymbolInfo *next = nullptr, FuncExtras *extra = nullptr) : name(name), type(type), next(next), extra(extra) {
+    SymbolInfo(string name, string type,FuncExtras *extra = nullptr, int line=line_count, SymbolInfo *next = nullptr) : name(name), type(type), line(line),next(next), extra(extra) {
     }
     ~SymbolInfo() { next = nullptr; if(extra!=nullptr) delete extra;}
     void setName(string name) { this->name = name; }
@@ -110,7 +120,20 @@ public:
     FuncExtras* getExtra(){
         return extra;
     }
-    
+    void setLine(int l){line = l;}
+    int getLine(){return line;}   
+    int getStartLine(){
+        return line;
+    }
+    int getEndLine(){
+        return line;
+    }
+    void setArray(){
+        array1 = true;
+    }
+    bool isArray(){
+        return array1;
+    }
 };
 
 
@@ -208,6 +231,33 @@ public:
         iter->setNext(new SymbolInfo(name, type));
         return true;
     }
+    bool Insert(string name, string type, FuncExtras *extras)
+    {
+        int hash = hashSdbm(name) % total_buckets;
+        if (hashTable[hash] == nullptr)
+        {
+            hashTable[hash] = new SymbolInfo(name, type, extras);
+            return true;
+        }
+        SymbolInfo *iter = hashTable[hash];
+        while (iter != nullptr)
+        {
+            if (iter->getName() == name)
+            {
+                return false;
+            }
+            iter = iter->getNext();
+        }
+        iter = hashTable[hash];
+        int pos = 2;
+        while (iter->getNext())
+        {
+            iter = iter->getNext();
+            pos++;
+        }
+        iter->setNext(new SymbolInfo(name, type,extras));
+        return true;
+    }
     SymbolInfo *Lookup(string name)
     {
         int hash = hashSdbm(name) % total_buckets;
@@ -262,9 +312,21 @@ public:
             if (iter == nullptr)
                 continue;
             fprintf(out, "\t%d", i);
+            if(iter->isFunc())
+                fprintf(out, " --> <%s,%s,%s>", iter->getName().c_str(), iter->getType().c_str(), iter->getExtra()->getReturnType().c_str());
+            else if(iter->isArray())
+                fprintf(out, " --> <%s,ARRAY>", iter->getName().c_str());
+            else
+                fprintf(out, " --> <%s,%s>", iter->getName().c_str(), iter->getType().c_str());
+            iter = iter->getNext();
             while (iter != nullptr)
             {
-                fprintf(out, " --> <%s,%s>", iter->getName().c_str(), iter->getType().c_str());
+                if(iter->isFunc())
+                    fprintf(out, " <%s,%s,%s>", iter->getName().c_str(), iter->getType().c_str(), iter->getExtra()->getReturnType().c_str());
+                else if(iter->isArray())
+                    fprintf(out, " <%s,ARRAY>", iter->getName().c_str());
+                else
+                    fprintf(out, " <%s,%s>", iter->getName().c_str(), iter->getType().c_str());
                 iter = iter->getNext();
             }
             fprintf(out, "\n");
@@ -307,6 +369,10 @@ public:
     bool Insert(string name, string type)
     {
         return current->Insert(name, type);
+    }
+    bool Insert(string name, string type, FuncExtras* extras)
+    {
+        return current->Insert(name, type,extras);
     }
     bool Remove(string name)
     {

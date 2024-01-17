@@ -20,7 +20,8 @@
 
 #define YYPURE 0
 
-#line 2 "parser.y"
+#line 1 "parser.y"
+
 #include "2005033.hpp"
 #include<iostream>
 #include<cstdlib>
@@ -35,7 +36,7 @@ extern FILE *yyin;
 extern int line_count;
 extern int err_count;
 extern int start_line;
-bool infunc;
+bool infunc = false;
 MyStack stack1;
 
 FILE *fp;
@@ -50,44 +51,89 @@ SymbolInfo *temp;
 string type;
 void yyerror(char *s)
 {
+	fprintf(logout,"Error at line %d: %s\n",line_count,s);
+	infunc = false;	
+	stack1.cleanUp();
+}
 
+FuncExtras *addExtraInFunc(string type, bool defined){
+	vector<Pair *> p;
+	SymbolInfo *s;
+	while(!stack1.isEmpty()){
+		s = stack1.pop() ;
+		p.push_back(new Pair(s->getName(), s->getType()));
+		s = nullptr;
+	}
+	return new FuncExtras(type,p,defined);
 }
 
 ParseTree* setLeft(string type, string line){
-	return new ParseTree(type,line);
+	return new ParseTree(type,line,line_count);
 }
 
 ParseTree* symbolToParse(SymbolInfo *s){
-	return new ParseTree("", s->getType()+" : "+s->getName());
+	if((s->getType()=="INT" or s->getType()=="FLOAT" or s->getType()=="VOID" or s->getType()=="FUNCTION") && !(s->getName()=="int" || s->getName()=="float" || s->getName()=="void"))
+		return new ParseTree("", "ID : "+s->getName(), s->getLine());
+	else
+		return new ParseTree("", s->getType()+" : "+s->getName(), s->getLine());
 }
 
 void insertParameters(){
-	{
 	if(infunc){
 		SymbolInfo *s;
 		while(!stack1.isEmpty()){
 			s = stack1.pop() ;
 			table->Insert(s->getName(),s->getType());
-			/* delete s;*/
+			delete s;
 			s = nullptr;
 		}
 		infunc = false;
 	}
 }
+
+/* error checking functions*/
+void leftRightTypeChecking(){
+
 }
+
+void indexIsInt(){
+
+}
+
+void intModint(SymbolInfo *op){
+
+}
+
+void functionArgumentCheck(){
+
+}
+
+void voidFuncCheck(){
+
+}
+
+void uniquenessCheck(){
+
+}
+
+void arrayIndexCheck(){
+
+}
+
+
 #ifdef YYSTYPE
 #undef  YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1
 #endif
 #ifndef YYSTYPE_IS_DECLARED
 #define YYSTYPE_IS_DECLARED 1
-#line 58 "parser.y"
+#line 103 "parser.y"
 typedef union YYSTYPE {
 	SymbolInfo* symbolInfo;
 	ParseTree* parseTree;
 } YYSTYPE;
 #endif /* !YYSTYPE_IS_DECLARED */
-#line 91 "y.tab.c"
+#line 137 "y.tab.c"
 
 /* compatibility with bison */
 #ifdef YYPARSE_PARAM
@@ -163,85 +209,85 @@ extern int YYPARSE_DECL();
 #define YYERRCODE 256
 typedef int YYINT;
 static const YYINT yylhs[] = {                           -1,
-    0,    1,    1,    2,    2,    2,    4,    4,    5,    5,
-    7,    7,    7,    7,    8,    8,    3,    6,    6,    6,
-   10,   10,   10,   10,    9,    9,   11,   11,   11,   11,
-   11,   11,   11,   11,   11,   13,   13,   20,   20,   12,
-   12,   14,   14,   15,   15,   16,   16,   17,   17,   18,
-   18,   18,   19,   19,   19,   19,   19,   19,   19,   21,
-   21,   22,   22,
+    0,    1,    1,    2,    2,    2,    4,    4,   23,    5,
+   24,    5,    7,    7,    7,    7,   25,    8,   26,    8,
+    3,    6,    6,    6,   10,   10,   10,   10,    9,    9,
+   11,   11,   11,   11,   11,   11,   11,   11,   11,   13,
+   13,   20,   20,   12,   12,   14,   14,   15,   15,   16,
+   16,   17,   17,   18,   18,   18,   19,   19,   19,   19,
+   19,   19,   19,   21,   21,   22,   22,
 };
 static const YYINT yylen[] = {                            2,
-    1,    2,    1,    1,    1,    1,    6,    5,    6,    5,
-    4,    3,    2,    1,    3,    2,    3,    1,    1,    1,
-    3,    6,    1,    4,    1,    2,    1,    1,    1,    7,
-    5,    7,    5,    5,    3,    1,    2,    1,    4,    1,
-    3,    1,    3,    1,    3,    1,    3,    1,    3,    2,
-    2,    1,    1,    4,    3,    1,    1,    2,    2,    1,
-    0,    3,    1,
+    1,    2,    1,    1,    1,    1,    6,    5,    0,    7,
+    0,    6,    4,    3,    2,    1,    0,    4,    0,    3,
+    3,    1,    1,    1,    3,    6,    1,    4,    1,    2,
+    1,    1,    1,    7,    5,    7,    5,    5,    3,    1,
+    2,    1,    4,    1,    3,    1,    3,    1,    3,    1,
+    3,    1,    3,    2,    2,    1,    1,    4,    3,    1,
+    1,    2,    2,    1,    0,    3,    1,
 };
 static const YYINT yydefred[] = {                         0,
-   18,   19,   20,    0,    0,    3,    4,    5,    6,    0,
-    2,    0,    0,    0,    0,   17,    0,    0,    0,    0,
-    0,    0,    8,    0,   10,   13,    0,    0,   24,    0,
-    0,    0,    0,    0,    0,   36,   16,   56,    0,    0,
-    0,   57,    0,   27,    0,   29,    0,   25,    0,   28,
-   40,    0,    0,    0,   48,   52,    0,    7,    9,    0,
-    0,    0,    0,    0,    0,    0,    0,    0,    0,   50,
-    0,   51,    0,   15,   26,   37,    0,    0,    0,    0,
-    0,   58,   59,   11,   22,    0,    0,    0,   63,    0,
-    0,    0,   55,    0,   35,   43,    0,    0,   49,   41,
-    0,    0,    0,   54,    0,   39,    0,    0,    0,   33,
-   62,   34,    0,    0,   32,   30,
+   22,   23,   24,    0,    0,    3,    4,    5,    6,    0,
+    2,    0,    0,    0,    0,   21,    0,    0,    0,    0,
+    0,    0,    8,    0,   15,    0,    0,   28,    0,    0,
+   12,    7,    0,    0,    0,    0,    0,   10,   13,   26,
+    0,    0,    0,    0,    0,   40,   60,    0,    0,    0,
+   61,    0,   31,    0,   33,    0,   29,    0,   32,   44,
+    0,    0,    0,   52,   56,    0,   20,    0,    0,    0,
+    0,    0,    0,    0,    0,   54,    0,   55,    0,   18,
+   30,   41,    0,    0,    0,    0,    0,   62,   63,    0,
+    0,    0,   67,    0,    0,    0,   59,    0,   39,   47,
+    0,    0,   53,   45,    0,    0,    0,   58,    0,   43,
+    0,    0,    0,   37,   66,   38,    0,    0,   36,   34,
 };
 #if defined(YYDESTRUCT_CALL) || defined(YYSTYPE_TOSTRING)
 static const YYINT yystos[] = {                           0,
   268,  269,  270,  287,  288,  289,  290,  291,  292,  293,
   289,  261,  297,  262,  271,  264,  267,  263,  293,  294,
-  272,  261,  264,  265,  295,  261,  263,  267,  273,  271,
-  257,  259,  260,  261,  262,  264,  266,  272,  274,  275,
-  279,  281,  282,  290,  293,  295,  296,  298,  299,  300,
-  301,  302,  303,  304,  305,  306,  307,  264,  295,  293,
-  272,  262,  262,  262,  262,  271,  299,  262,  299,  305,
-  307,  305,  261,  266,  298,  264,  277,  278,  279,  280,
-  276,  283,  284,  261,  273,  299,  300,  299,  301,  308,
-  309,  299,  263,  261,  264,  302,  303,  304,  305,  301,
-  263,  300,  263,  263,  267,  273,  263,  298,  299,  298,
-  301,  264,  258,  263,  298,  298,
+  272,  261,  264,  311,  261,  263,  267,  273,  271,  265,
+  295,  264,  310,  293,  272,  312,  313,  295,  261,  273,
+  257,  259,  260,  261,  262,  264,  272,  274,  275,  279,
+  281,  282,  290,  293,  295,  296,  298,  299,  300,  301,
+  302,  303,  304,  305,  306,  307,  266,  262,  262,  262,
+  262,  271,  299,  262,  299,  305,  307,  305,  261,  266,
+  298,  264,  277,  278,  279,  280,  276,  283,  284,  299,
+  300,  299,  301,  308,  309,  299,  263,  261,  264,  302,
+  303,  304,  305,  301,  263,  300,  263,  263,  267,  273,
+  263,  298,  299,  298,  301,  264,  258,  263,  298,  298,
 };
 #endif /* YYDESTRUCT_CALL || YYSTYPE_TOSTRING */
 static const YYINT yydgoto[] = {                          4,
-    5,    6,   44,    8,    9,   45,   20,   46,   47,   13,
-   48,   49,   50,   51,   52,   53,   54,   55,   56,   57,
-   90,   91,
+    5,    6,   53,    8,    9,   54,   20,   55,   56,   13,
+   57,   58,   59,   60,   61,   62,   63,   64,   65,   66,
+   94,   95,   33,   24,   36,   37,
 };
-static const YYINT yysindex[] = {                       -60,
-    0,    0,    0,    0,  -60,    0,    0,    0,    0, -238,
-    0, -252, -152, -179, -230,    0, -227, -122, -207, -218,
- -213, -205,    0, -187,    0,    0, -107,  -60,    0, -201,
- -186, -182, -176, -250,  -87,    0,    0,    0, -160,  -87,
-  -87,    0,  -87,    0, -155,    0, -161,    0, -154,    0,
-    0, -149, -100, -163,    0,    0,  -44,    0,    0, -138,
- -141,  -87, -229,  -87,  -87,  -87, -127, -116, -115,    0,
-  -50,    0, -117,    0,    0,    0,  -87,  -87,  -87,  -87,
-  -87,    0,    0,    0,    0, -101, -229,  -99,    0,  -94,
-  -91,  -82,    0,  -77,    0,    0,  -86, -163,    0,    0,
- -109,  -87, -109,    0,  -87,    0,  -68,  -58,  -36,    0,
-    0,    0, -109, -109,    0,    0,
+static const YYINT yysindex[] = {                      -211,
+    0,    0,    0,    0, -211,    0,    0,    0,    0, -240,
+    0, -231, -132, -185, -207,    0, -191, -190, -181, -176,
+ -177, -162,    0, -154,    0, -151, -211,    0, -155,    0,
+    0,    0, -154, -139, -147, -115, -136,    0,    0,    0,
+ -125, -119, -110, -216, -229,    0,    0, -106, -229, -229,
+    0, -229,    0, -103,    0, -193,    0, -101,    0,    0,
+ -109,  -66, -107,    0,    0,  -80,    0, -229,  -92, -229,
+ -229, -229,  -84,  -78,  -73,    0,  -68,    0,  -85,    0,
+    0,    0, -229, -229, -229, -229, -229,    0,    0,  -58,
+  -92,  -44,    0,  -41,  -72,  -76,    0,  -40,    0,    0,
+  -51, -107,    0,    0, -115, -229, -115,    0, -229,    0,
+  -35,  -28,  -29,    0,    0,    0, -115, -115,    0,    0,
 };
 static const YYINT yyrindex[] = {                         0,
-    0,    0,    0,    0,  202,    0,    0,    0,    0,    0,
-    0, -148,    0,    0,    0,    0,    0,    0, -208,    0,
-    0, -126,    0,    0,    0,    0,    0,    0,    0,    0,
-    0,    0,    0,  -96,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,  235,    0,    0,    0,    0,    0,
+    0, -128,    0,    0,    0,    0,    0,  -27, -163,    0,
+    0, -116,    0,    0,    0,  -26,    0,    0,    0, -167,
+    0,    0,    0, -157,    0,    0,    0,    0,    0,    0,
+    0,    0,    0, -102,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-    0,  -47, -249,  -66,    0,    0,  -74,    0,    0, -170,
-    0,    0,    0,    0,  -27,    0,    0,    0,    0,    0,
- -216,    0, -148,    0,    0,    0,    0,    0,    0,    0,
+ -219, -254,  -53,    0,    0,  -71,    0,    0,    0,    0,
+  -23,    0,    0,    0,    0,    0,  -79,    0, -128,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-  -26,    0,    0,    0,    0,    0,  -42,  -49,    0,    0,
-    0,    0,    0,    0,    0,    0,    0, -135,    0,    0,
-    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,  -22,    0,    0,    0,    0,    0,
+ -249,  -46,    0,    0,    0,    0,    0,    0,    0,    0,
+    0, -141,    0,    0,    0,    0,    0,    0,    0,    0,
 };
 #if YYBTYACC
 static const YYINT yycindex[] = {                         0,
@@ -256,68 +302,68 @@ static const YYINT yycindex[] = {                         0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 };
 #endif
 static const YYINT yygindex[] = {                         0,
-    0,  214,   11,    0,    0,    8,    0,   -1,    0,    0,
-  -45,  -35,  -57,  -61,  146,  160,  162,  -34,    0,  -40,
-    0,    0,
+    0,  231,   11,    0,    0,   12,    0,   23,    0,    0,
+  -56,  -43,  -61,  -67,  154,  158,  159,  -45,    0,  -49,
+    0,    0,    0,    0,    0,    0,
 };
-#define YYTABLESIZE 241
-static const YYINT yytable[] = {                         67,
-   71,   75,   71,   89,   69,   87,   70,   10,   72,   14,
-    7,   65,   10,   44,   44,    7,   25,   44,   15,  100,
-   66,   19,   12,   44,   71,   59,   86,   44,   88,  102,
-   92,   34,   35,   22,   36,   60,   71,   71,   71,   71,
-   71,   21,   38,  111,   27,   99,   53,   53,   28,   41,
-   53,   42,   43,   26,   14,  108,   53,  110,   14,   29,
-   53,   53,   53,   53,   71,   30,  109,  115,  116,   31,
-   61,   32,   33,   34,   35,   62,   36,   24,   37,   63,
-    1,    2,    3,   18,   38,   64,   39,   40,    1,    2,
-    3,   41,   12,   42,   43,   31,   12,   32,   33,   34,
-   35,   68,   36,   24,   74,   73,    1,    2,    3,   76,
-   38,   16,   39,   40,   17,   23,   80,   41,   23,   42,
-   43,   31,   84,   31,   31,   31,   31,   77,   31,   31,
-   31,   85,   31,   31,   31,   93,   31,   21,   31,   31,
-   21,   23,   24,   31,   94,   31,   31,   31,   95,   32,
-   33,   34,   35,   15,   36,   24,   58,   24,    1,    2,
-    3,  101,   38,  103,   39,   40,   38,   38,  104,   41,
-   38,   42,   43,   34,   35,  105,   38,   78,   79,   38,
-   38,   38,   38,   38,   38,  107,   38,   38,   53,   53,
-  106,   41,   79,   42,   43,  112,   46,   46,   53,  113,
-   46,    1,   53,   53,   53,   53,   46,    1,    2,    3,
-   46,   46,   46,   47,   47,   42,   42,   47,   11,   42,
-   45,   45,   96,   47,   45,   42,  114,   47,   47,   47,
-   45,   81,   82,   83,   45,   61,   60,   97,   82,   83,
-   98,
+#define YYTABLESIZE 244
+static const YYINT yytable[] = {                         81,
+   77,   73,   77,   93,   76,   75,   78,   91,   48,   48,
+    7,   10,   48,   49,   49,    7,   10,   49,   48,  104,
+   12,   77,   48,   49,   90,   19,   92,   49,   96,  106,
+   14,   44,   45,   77,   77,   77,   77,   77,   34,   15,
+  103,  115,   47,   46,   46,   71,   31,   46,  112,   50,
+  114,   51,   52,   46,   72,   38,    1,    2,    3,   77,
+  119,  120,  113,   41,   21,   42,   43,   44,   45,   22,
+   46,   30,   80,   23,    1,    2,    3,   18,   47,   25,
+   48,   49,    1,    2,    3,   50,   26,   51,   52,   17,
+   27,   17,   17,   17,   17,   28,   17,   17,   19,   16,
+   17,   17,   17,   16,   17,   14,   17,   17,   29,   14,
+   30,   17,   32,   17,   17,   35,   35,   35,   35,   35,
+   35,   39,   35,   35,   35,   40,   35,   35,   35,   67,
+   35,   16,   35,   35,   17,   27,   68,   35,   27,   35,
+   35,   41,   69,   42,   43,   44,   45,   25,   46,   30,
+   25,   70,    1,    2,    3,   74,   47,   79,   48,   49,
+   42,   42,   82,   50,   42,   51,   52,   83,   44,   45,
+   42,   46,   86,   42,   42,   42,   42,   42,   97,   47,
+   42,   42,   98,   57,   57,   15,   50,   57,   51,   52,
+   99,   57,   57,   57,  109,   87,  110,   57,   57,   57,
+   57,   57,   88,   89,  105,   57,   57,   57,   57,   50,
+   50,   84,   85,   50,   88,   89,   51,   51,  107,   50,
+   51,  108,  111,   50,   50,   50,   51,   85,  116,  117,
+   51,   51,   51,  118,    1,   11,  100,   11,    9,   65,
+   64,  101,    0,  102,
 };
-static const YYINT yycheck[] = {                         35,
-   41,   47,   43,   65,   40,   63,   41,    0,   43,  262,
-    0,  262,    5,  263,  264,    5,   18,  267,  271,   81,
-  271,   14,  261,  273,   65,   27,   62,  277,   64,   87,
-   66,  261,  262,  261,  264,   28,   77,   78,   79,   80,
-   81,  272,  272,  105,  263,   80,  263,  264,  267,  279,
-  267,  281,  282,  261,  263,  101,  273,  103,  267,  273,
-  277,  278,  279,  280,  105,  271,  102,  113,  114,  257,
-  272,  259,  260,  261,  262,  262,  264,  265,  266,  262,
-  268,  269,  270,  263,  272,  262,  274,  275,  268,  269,
-  270,  279,  263,  281,  282,  257,  267,  259,  260,  261,
-  262,  262,  264,  265,  266,  261,  268,  269,  270,  264,
-  272,  264,  274,  275,  267,  264,  280,  279,  267,  281,
-  282,  257,  261,  259,  260,  261,  262,  277,  264,  265,
-  266,  273,  268,  269,  270,  263,  272,  264,  274,  275,
-  267,  264,  265,  279,  261,  281,  282,  257,  264,  259,
-  260,  261,  262,  271,  264,  265,  264,  265,  268,  269,
-  270,  263,  272,  263,  274,  275,  263,  264,  263,  279,
-  267,  281,  282,  261,  262,  267,  273,  278,  279,  276,
-  277,  278,  279,  280,  272,  263,  283,  284,  263,  264,
-  273,  279,  279,  281,  282,  264,  263,  264,  273,  258,
-  267,    0,  277,  278,  279,  280,  273,  268,  269,  270,
-  277,  278,  279,  263,  264,  263,  264,  267,    5,  267,
-  263,  264,   77,  273,  267,  273,  263,  277,  278,  279,
-  273,  276,  283,  284,  277,  263,  263,   78,  283,  284,
-   79,
+static const YYINT yycheck[] = {                         56,
+   50,   45,   52,   71,   50,   49,   52,   69,  263,  264,
+    0,    0,  267,  263,  264,    5,    5,  267,  273,   87,
+  261,   71,  277,  273,   68,   14,   70,  277,   72,   91,
+  262,  261,  262,   83,   84,   85,   86,   87,   27,  271,
+   86,  109,  272,  263,  264,  262,   24,  267,  105,  279,
+  107,  281,  282,  273,  271,   33,  268,  269,  270,  109,
+  117,  118,  106,  257,  272,  259,  260,  261,  262,  261,
+  264,  265,  266,  264,  268,  269,  270,  263,  272,  261,
+  274,  275,  268,  269,  270,  279,  263,  281,  282,  257,
+  267,  259,  260,  261,  262,  273,  264,  265,  266,  263,
+  268,  269,  270,  267,  272,  263,  274,  275,  271,  267,
+  265,  279,  264,  281,  282,  257,  272,  259,  260,  261,
+  262,  261,  264,  265,  266,  273,  268,  269,  270,  266,
+  272,  264,  274,  275,  267,  264,  262,  279,  267,  281,
+  282,  257,  262,  259,  260,  261,  262,  264,  264,  265,
+  267,  262,  268,  269,  270,  262,  272,  261,  274,  275,
+  263,  264,  264,  279,  267,  281,  282,  277,  261,  262,
+  273,  264,  280,  276,  277,  278,  279,  280,  263,  272,
+  283,  284,  261,  263,  264,  271,  279,  267,  281,  282,
+  264,  263,  264,  273,  267,  276,  273,  277,  278,  279,
+  280,  273,  283,  284,  263,  277,  278,  279,  280,  263,
+  264,  278,  279,  267,  283,  284,  263,  264,  263,  273,
+  267,  263,  263,  277,  278,  279,  273,  279,  264,  258,
+  277,  278,  279,  263,    0,    5,   83,  265,  265,  263,
+  263,   84,   -1,   85,
 };
 #if YYBTYACC
 static const YYINT yyctable[] = {                        -1,
@@ -345,6 +391,7 @@ static const YYINT yyctable[] = {                        -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
+   -1,   -1,   -1,
 };
 #endif
 #define YYFINAL 4
@@ -352,7 +399,7 @@ static const YYINT yyctable[] = {                        -1,
 #define YYDEBUG 0
 #endif
 #define YYMAXTOKEN 285
-#define YYUNDFTOKEN 310
+#define YYUNDFTOKEN 314
 #define YYTRANSLATE(a) ((a) > YYMAXTOKEN ? YYUNDFTOKEN : (a))
 #if YYDEBUG
 static const char *const yyname[] = {
@@ -371,8 +418,8 @@ static const char *const yyname[] = {
 "type_specifier","parameter_list","compound_statement","statements",
 "declaration_list","statement","expression","expression_statement",
 "logic_expression","rel_expression","simple_expression","term",
-"unary_expression","factor","variable","argument_list","arguments",
-"illegal-symbol",
+"unary_expression","factor","variable","argument_list","arguments","$$1","$$2",
+"$$3","$$4","illegal-symbol",
 };
 static const char *const yyrule[] = {
 "$accept : start",
@@ -384,14 +431,18 @@ static const char *const yyrule[] = {
 "unit : func_definition",
 "func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON",
 "func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON",
-"func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement",
-"func_definition : type_specifier ID LPAREN RPAREN compound_statement",
+"$$1 :",
+"func_definition : type_specifier ID LPAREN parameter_list RPAREN $$1 compound_statement",
+"$$2 :",
+"func_definition : type_specifier ID LPAREN RPAREN $$2 compound_statement",
 "parameter_list : parameter_list COMMA type_specifier ID",
 "parameter_list : parameter_list COMMA type_specifier",
 "parameter_list : type_specifier ID",
 "parameter_list : type_specifier",
-"compound_statement : LCURL statements RCURL",
-"compound_statement : LCURL RCURL",
+"$$3 :",
+"compound_statement : LCURL $$3 statements RCURL",
+"$$4 :",
+"compound_statement : LCURL $$4 RCURL",
 "var_declaration : type_specifier declaration_list SEMICOLON",
 "type_specifier : INT",
 "type_specifier : FLOAT",
@@ -570,10 +621,11 @@ static YYINT  *yylexp = 0;
 
 static YYINT  *yylexemes = 0;
 #endif /* YYBTYACC */
-#line 635 "parser.y"
+#line 671 "parser.y"
+
 int main(int argc,char *argv[])
 {
-	infunc = false;
+	
 	if((fp=fopen(argv[1],"r"))==NULL)
 	{
 		printf("Cannot Open Input File.\n");
@@ -590,7 +642,7 @@ int main(int argc,char *argv[])
 	yyin=fp;
 	yyparse();
 	
-	fprintf(logout,"Total lines: %d\nTotal errors: %d\n", line_count,err_count);
+	fprintf(logout,"Total Lines: %d\nTotal Errors: %d\n", line_count,err_count);
 	
 	delete table;
 	fclose(checkerout);
@@ -600,8 +652,7 @@ int main(int argc,char *argv[])
 	fclose(fp);
 	return 0;
 }
-
-#line 605 "y.tab.c"
+#line 656 "y.tab.c"
 
 /* Release memory associated with symbol. */
 #if ! defined YYDESTRUCT_IS_DECLARED
@@ -611,234 +662,274 @@ YYDESTRUCT_DECL()
     switch (psymb)
     {
 	case 287:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 622 "y.tab.c"
+#line 673 "y.tab.c"
 	break;
 	case 288:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 632 "y.tab.c"
+#line 683 "y.tab.c"
 	break;
 	case 289:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 642 "y.tab.c"
+#line 693 "y.tab.c"
 	break;
 	case 290:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 652 "y.tab.c"
+#line 703 "y.tab.c"
 	break;
 	case 291:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 662 "y.tab.c"
+#line 713 "y.tab.c"
 	break;
 	case 292:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 672 "y.tab.c"
+#line 723 "y.tab.c"
 	break;
 	case 293:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 682 "y.tab.c"
+#line 733 "y.tab.c"
 	break;
 	case 294:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 692 "y.tab.c"
+#line 743 "y.tab.c"
 	break;
 	case 295:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 702 "y.tab.c"
+#line 753 "y.tab.c"
 	break;
 	case 296:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 712 "y.tab.c"
+#line 763 "y.tab.c"
 	break;
 	case 297:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 722 "y.tab.c"
+#line 773 "y.tab.c"
 	break;
 	case 298:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 732 "y.tab.c"
+#line 783 "y.tab.c"
 	break;
 	case 299:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 742 "y.tab.c"
+#line 793 "y.tab.c"
 	break;
 	case 300:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 752 "y.tab.c"
+#line 803 "y.tab.c"
 	break;
 	case 301:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 762 "y.tab.c"
+#line 813 "y.tab.c"
 	break;
 	case 302:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 772 "y.tab.c"
+#line 823 "y.tab.c"
 	break;
 	case 303:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 782 "y.tab.c"
+#line 833 "y.tab.c"
 	break;
 	case 304:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 792 "y.tab.c"
+#line 843 "y.tab.c"
 	break;
 	case 305:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 802 "y.tab.c"
+#line 853 "y.tab.c"
 	break;
 	case 306:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 812 "y.tab.c"
+#line 863 "y.tab.c"
 	break;
 	case 307:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 822 "y.tab.c"
+#line 873 "y.tab.c"
 	break;
 	case 308:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 832 "y.tab.c"
+#line 883 "y.tab.c"
 	break;
 	case 309:
-#line 72 "parser.y"
+#line 113 "parser.y"
 	{
 	if((*val).parseTree!=nullptr){
 		delete (*val).parseTree;
 		(*val).parseTree = nullptr;
 	}
 }
-#line 842 "y.tab.c"
+#line 893 "y.tab.c"
+	break;
+	case 310:
+#line 113 "parser.y"
+	{
+	if((*val).parseTree!=nullptr){
+		delete (*val).parseTree;
+		(*val).parseTree = nullptr;
+	}
+}
+#line 903 "y.tab.c"
+	break;
+	case 311:
+#line 113 "parser.y"
+	{
+	if((*val).parseTree!=nullptr){
+		delete (*val).parseTree;
+		(*val).parseTree = nullptr;
+	}
+}
+#line 913 "y.tab.c"
+	break;
+	case 312:
+#line 113 "parser.y"
+	{
+	if((*val).parseTree!=nullptr){
+		delete (*val).parseTree;
+		(*val).parseTree = nullptr;
+	}
+}
+#line 923 "y.tab.c"
+	break;
+	case 313:
+#line 113 "parser.y"
+	{
+	if((*val).parseTree!=nullptr){
+		delete (*val).parseTree;
+		(*val).parseTree = nullptr;
+	}
+}
+#line 933 "y.tab.c"
 	break;
     }
 }
@@ -1514,757 +1605,777 @@ yyreduce:
     switch (yyn)
     {
 case 1:
-#line 86 "parser.y"
+#line 125 "parser.y"
 	{
 		fprintf(logout,"start : program \n");
 		yyval.parseTree = setLeft("start","start : program");
 		yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
-		yyval.parseTree->setEndLine(line_count);
 		yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
+		yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 		yyval.parseTree->printTree(yyval.parseTree,0,parseout);
 	}
-#line 1527 "y.tab.c"
+#line 1618 "y.tab.c"
 break;
 case 2:
-#line 96 "parser.y"
+#line 135 "parser.y"
 	{
 		fprintf(logout,"program : program unit \n");
 		yyval.parseTree = setLeft("program","program : program unit");
 		yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); 
 		yyval.parseTree->addChild(yystack.l_mark[0].parseTree); 
 		yyval.parseTree->setStartLine(yystack.l_mark[-1].parseTree->getStartLine());
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 
 	}
-#line 1540 "y.tab.c"
+#line 1631 "y.tab.c"
 break;
 case 3:
-#line 105 "parser.y"
+#line 144 "parser.y"
 	{
 		fprintf(logout,"program : unit \n");
 		yyval.parseTree = setLeft("program","program : unit");
 		yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 		yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 	}
-#line 1551 "y.tab.c"
+#line 1642 "y.tab.c"
 break;
 case 4:
-#line 114 "parser.y"
+#line 153 "parser.y"
 	{
 		fprintf(logout,"unit : var_declaration  \n");
 		yyval.parseTree = setLeft("unit","unit : var_declaration");
 		yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 		yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 	}
-#line 1562 "y.tab.c"
+#line 1653 "y.tab.c"
 break;
 case 5:
-#line 121 "parser.y"
+#line 160 "parser.y"
 	{
 		fprintf(logout,"unit : func_declaration  \n");
 		yyval.parseTree = setLeft("unit","unit : func_declaration");
 		yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 		yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 	 }
-#line 1573 "y.tab.c"
+#line 1664 "y.tab.c"
 break;
 case 6:
-#line 128 "parser.y"
+#line 167 "parser.y"
 	{
 		fprintf(logout,"unit : func_definition  \n");
 		yyval.parseTree = setLeft("unit","unit : func_definition");
 		yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 		yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 	 }
-#line 1584 "y.tab.c"
+#line 1675 "y.tab.c"
 break;
 case 7:
-#line 137 "parser.y"
+#line 176 "parser.y"
 	{
 			yyval.parseTree = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON");
 			fprintf(logout,"func_declaration : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
 			temp = yystack.l_mark[-4].symbolInfo;
-			table->Insert(temp->getName(),"FUNCTION");
-			yyval.parseTree->addChild(yystack.l_mark[-5].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-4].symbolInfo)); yyval.parseTree->addChild(new ParseTree("","LPAREN : ("));
-			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(new ParseTree("","RPAREN : )")); yyval.parseTree->addChild(new ParseTree("","SEMICOLON : ;"));
+			table->Insert(temp->getName(),"FUNCTION", addExtraInFunc(yystack.l_mark[-5].parseTree->getType(),false));
+			yyval.parseTree->addChild(yystack.l_mark[-5].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-4].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo));
+			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
 			yyval.parseTree->setStartLine(yystack.l_mark[-5].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
-			infunc = false;
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());	
 			stack1.cleanUp();
 		}
-#line 1600 "y.tab.c"
+#line 1690 "y.tab.c"
 break;
 case 8:
-#line 149 "parser.y"
+#line 187 "parser.y"
 	{
 			yyval.parseTree = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON");
 			fprintf(logout,"func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON \n");
 			temp = yystack.l_mark[-3].symbolInfo;
-			table->Insert(temp->getName(),"FUNCTION");
-			yyval.parseTree->addChild(yystack.l_mark[-4].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(new ParseTree("","LPAREN : ("));
-			yyval.parseTree->addChild(new ParseTree("","RPAREN : )")); yyval.parseTree->addChild(new ParseTree("","SEMICOLON : ;"));
+			table->Insert(temp->getName(),"FUNCTION",addExtraInFunc(yystack.l_mark[-4].parseTree->getType(),false));
+			yyval.parseTree->addChild(yystack.l_mark[-4].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo));
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
 			yyval.parseTree->setStartLine(yystack.l_mark[-4].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 		}
-#line 1614 "y.tab.c"
+#line 1704 "y.tab.c"
 break;
 case 9:
-#line 161 "parser.y"
-	{
-			yyval.parseTree = setLeft("func_definition","func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement ");
-			fprintf(logout,"func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
-			temp = yystack.l_mark[-4].symbolInfo;
-			table->Insert(temp->getName(),"FUNCTION");
-			yyval.parseTree->addChild(yystack.l_mark[-5].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-4].symbolInfo)); yyval.parseTree->addChild(new ParseTree("","LPAREN : ("));
-			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(new ParseTree("","RPAREN : )")); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
-			yyval.parseTree->setStartLine(yystack.l_mark[-5].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);	
-		}
-#line 1628 "y.tab.c"
+#line 199 "parser.y"
+	{infunc = true;}
+#line 1709 "y.tab.c"
 break;
 case 10:
-#line 171 "parser.y"
+#line 199 "parser.y"
+	{ /**/
+			yyval.parseTree = setLeft("func_definition","func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement ");
+			fprintf(logout,"func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
+			temp = yystack.l_mark[-5].symbolInfo;
+			table->Insert(temp->getName(),"FUNCTION",addExtraInFunc(yystack.l_mark[-6].parseTree->getType(),true));
+			yyval.parseTree->addChild(yystack.l_mark[-6].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-5].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-4].symbolInfo));
+			yyval.parseTree->addChild(yystack.l_mark[-3].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
+			yyval.parseTree->setStartLine(yystack.l_mark[-6].parseTree->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+				
+		}
+#line 1724 "y.tab.c"
+break;
+case 11:
+#line 210 "parser.y"
+	{infunc = true;}
+#line 1729 "y.tab.c"
+break;
+case 12:
+#line 210 "parser.y"
 	{
 			yyval.parseTree = setLeft("func_definition","func_definition : type_specifier ID LPAREN RPAREN compound_statement ");
 			fprintf(logout,"func_definition : type_specifier ID LPAREN RPAREN compound_statement\n");
-			temp = yystack.l_mark[-3].symbolInfo;
-			table->Insert(temp->getName(),"FUNCTION");
-			yyval.parseTree->addChild(yystack.l_mark[-4].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(new ParseTree("","LPAREN : ("));
-			yyval.parseTree->addChild(new ParseTree("","RPAREN : )")); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);		
-			yyval.parseTree->setStartLine(yystack.l_mark[-4].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			temp = yystack.l_mark[-4].symbolInfo;
+			table->Insert(temp->getName(),"FUNCTION",addExtraInFunc(yystack.l_mark[-5].parseTree->getType(),true));
+			yyval.parseTree->addChild(yystack.l_mark[-5].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-4].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo));
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);		
+			yyval.parseTree->setStartLine(yystack.l_mark[-5].parseTree->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());			
 		}
-#line 1642 "y.tab.c"
+#line 1743 "y.tab.c"
 break;
-case 11:
-#line 184 "parser.y"
+case 13:
+#line 223 "parser.y"
 	{
-			infunc = true;
 			yyval.parseTree = setLeft("parameter_list","parameter_list : parameter_list COMMA type_specifier ID");
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier ID\n");
 			temp = yystack.l_mark[0].symbolInfo;
 			stack1.push(new SymbolInfo(temp->getName(), type));
-			yyval.parseTree->addChild(yystack.l_mark[-3].parseTree); yyval.parseTree->addChild(new ParseTree("","COMMA : ,"));
+			yyval.parseTree->addChild(yystack.l_mark[-3].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo));
 			yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
 			yyval.parseTree->setStartLine(yystack.l_mark[-3].parseTree->getStartLine());	
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 		}
-#line 1657 "y.tab.c"
+#line 1757 "y.tab.c"
 break;
-case 12:
-#line 195 "parser.y"
+case 14:
+#line 233 "parser.y"
 	{
 			yyval.parseTree = setLeft("parameter_list", "parameter_list : parameter_list COMMA type_specifier");
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier\n");
-			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(new ParseTree("","COMMA : ,")); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
+			stack1.push(new SymbolInfo("", type));
+			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[-2].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 		}
-#line 1668 "y.tab.c"
+#line 1769 "y.tab.c"
 break;
-case 13:
-#line 202 "parser.y"
+case 15:
+#line 241 "parser.y"
 	{
-			infunc = true;
 			yyval.parseTree = setLeft("parameter_list","parameter_list  : type_specifier ID");
 			fprintf(logout,"parameter_list  : type_specifier ID\n");
 			temp = yystack.l_mark[0].symbolInfo;
 			stack1.push(new SymbolInfo(temp->getName(), type));
 			yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
 			yyval.parseTree->setStartLine(yystack.l_mark[-1].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 		}
-#line 1682 "y.tab.c"
+#line 1782 "y.tab.c"
 break;
-case 14:
-#line 212 "parser.y"
+case 16:
+#line 250 "parser.y"
 	{
 			yyval.parseTree = setLeft("parameter_list","parameter_list  : type_specifier");
 			fprintf(logout,"parameter_list  : type_specifier\n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 		}
-#line 1693 "y.tab.c"
+#line 1793 "y.tab.c"
 break;
-case 15:
-#line 222 "parser.y"
+case 17:
+#line 260 "parser.y"
+	{insertParameters();}
+#line 1798 "y.tab.c"
+break;
+case 18:
+#line 260 "parser.y"
 	{
 				yyval.parseTree = setLeft("compound_statement","compound_statement : LCURL statements RCURL");
-				if(yyval.parseTree == nullptr)
-				cout<<"Null ";
 				fprintf(logout,"compound_statement : LCURL statements RCURL  \n");
 				table->printAll(logout);
 				table->ExitScope();
-				yyval.parseTree->addChild(new ParseTree("","LCURL : {")); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(new ParseTree("","RCURL : }"));
-				yyval.parseTree->setStartLine(start_line);
-				yyval.parseTree->setEndLine(line_count);		
+				yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+				yyval.parseTree->setStartLine(yystack.l_mark[-3].symbolInfo->getStartLine());
+				yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());			
 			}
-#line 1708 "y.tab.c"
+#line 1811 "y.tab.c"
 break;
-case 16:
-#line 233 "parser.y"
+case 19:
+#line 269 "parser.y"
+	{insertParameters();}
+#line 1816 "y.tab.c"
+break;
+case 20:
+#line 269 "parser.y"
 	{
 				yyval.parseTree = setLeft("compound_statement","compound_statement : LCURL RCURL");
 				fprintf(logout,"compound_statement : LCURL RCURL  \n");
 				table->printAll(logout);
 				table->ExitScope();
-				yyval.parseTree->addChild(new ParseTree("","LCURL : {")); yyval.parseTree->addChild(new ParseTree("","RCURL : }"));
-				yyval.parseTree->setStartLine(start_line);
-				yyval.parseTree->setEndLine(line_count);
+				yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+				yyval.parseTree->setStartLine(yystack.l_mark[-2].symbolInfo->getStartLine());
+				yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 			}
-#line 1721 "y.tab.c"
+#line 1829 "y.tab.c"
 break;
-case 17:
-#line 244 "parser.y"
+case 21:
+#line 280 "parser.y"
 	{
 		yyval.parseTree = setLeft("var_declaration","var_declaration : type_specifier declaration_list SEMICOLON");
 		fprintf(logout,"var_declaration : type_specifier declaration_list SEMICOLON  \n");
-		yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(new ParseTree("","SEMICOLON : ;")); 
+		yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo)); 
 		yyval.parseTree->setStartLine(yystack.l_mark[-2].parseTree->getStartLine());
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 		}
-#line 1732 "y.tab.c"
+#line 1840 "y.tab.c"
 break;
-case 18:
-#line 253 "parser.y"
+case 22:
+#line 289 "parser.y"
 	{
-		yyval.parseTree = setLeft("type_specifier", "type_specifier : INT");fprintf(logout,"type_specifier : INT \n"); type = "INT"; 
-		yyval.parseTree->addChild(new ParseTree("","INT : int")); 
-		yyval.parseTree->setStartLine(start_line);
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree = setLeft("INT", "type_specifier : INT");fprintf(logout,"type_specifier : INT \n"); type = "INT"; 
+		yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+		yyval.parseTree->setStartLine(yystack.l_mark[0].symbolInfo->getStartLine());
+		yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 		}
-#line 1742 "y.tab.c"
+#line 1850 "y.tab.c"
 break;
-case 19:
-#line 259 "parser.y"
+case 23:
+#line 295 "parser.y"
 	{
-		yyval.parseTree = setLeft("type_specifier", "type_specifier : FLOAT");fprintf(logout,"type_specifier : FLOAT \n"); type = "FLOAT"; 
-		yyval.parseTree->addChild(new ParseTree("","FLOAT : float")); 
-		yyval.parseTree->setStartLine(start_line);
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree = setLeft("FLOAT", "type_specifier : FLOAT");fprintf(logout,"type_specifier : FLOAT \n"); type = "FLOAT"; 
+		yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+		yyval.parseTree->setStartLine(yystack.l_mark[0].symbolInfo->getStartLine());
+		yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 		}
-#line 1752 "y.tab.c"
+#line 1860 "y.tab.c"
 break;
-case 20:
-#line 265 "parser.y"
+case 24:
+#line 301 "parser.y"
 	{
-		yyval.parseTree = setLeft("type_specifier", "type_specifier : VOID");fprintf(logout,"type_specifier : VOID \n"); type = "VOID"; 
-		yyval.parseTree->addChild(new ParseTree("","VOID : void")); 
-		yyval.parseTree->setStartLine(start_line);
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree = setLeft("VOID", "type_specifier : VOID");fprintf(logout,"type_specifier : VOID \n"); type = "VOID"; 
+		yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+		yyval.parseTree->setStartLine(yystack.l_mark[0].symbolInfo->getStartLine());
+		yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 		}
-#line 1762 "y.tab.c"
+#line 1870 "y.tab.c"
 break;
-case 21:
-#line 273 "parser.y"
+case 25:
+#line 309 "parser.y"
 	{
 				yyval.parseTree=setLeft("declaration_list","declaration_list : declaration_list COMMA ID");
 				fprintf(logout,"declaration_list : declaration_list COMMA ID \n");
 				temp = yystack.l_mark[0].symbolInfo;
 				table->Insert(temp->getName(),type);
-				yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(new ParseTree("","COMMA : ,")); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+				yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
 				yyval.parseTree->setStartLine(yystack.l_mark[-2].parseTree->getStartLine());
-				yyval.parseTree->setEndLine(line_count);
+				yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 				}
-#line 1775 "y.tab.c"
+#line 1883 "y.tab.c"
 break;
-case 22:
-#line 282 "parser.y"
+case 26:
+#line 318 "parser.y"
 	{
 				yyval.parseTree=setLeft("declaration_list","declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE");
 				fprintf(logout,"declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE \n");
 				temp = yystack.l_mark[-3].symbolInfo;
 				table->Insert(temp->getName(),type);
-				yyval.parseTree->addChild(yystack.l_mark[-5].parseTree); yyval.parseTree->addChild(new ParseTree("","COMMA : ,")); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo));
-				yyval.parseTree->addChild(new ParseTree("","LTHIRD : [")); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(new ParseTree("","RTHIRD : ]")); 
+				yyval.parseTree->addChild(yystack.l_mark[-5].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-4].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo));
+				yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo)); 
 				yyval.parseTree->setStartLine(yystack.l_mark[-5].parseTree->getStartLine());
-				yyval.parseTree->setEndLine(line_count);
+				yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());	
 				}
-#line 1789 "y.tab.c"
+#line 1897 "y.tab.c"
 break;
-case 23:
-#line 292 "parser.y"
+case 27:
+#line 328 "parser.y"
 	{
 				yyval.parseTree=setLeft("declaration_list", "declaration_list : ID");
 				fprintf(logout,"declaration_list : ID \n");
 				temp = yystack.l_mark[0].symbolInfo;
 				table->Insert(temp->getName(),type);
 				yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
-				yyval.parseTree->setStartLine(start_line);
-				yyval.parseTree->setEndLine(line_count);
+				yyval.parseTree->setStartLine(yystack.l_mark[0].symbolInfo->getStartLine());
+				yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
+	
 		  		}
-#line 1802 "y.tab.c"
+#line 1911 "y.tab.c"
 break;
-case 24:
-#line 301 "parser.y"
+case 28:
+#line 338 "parser.y"
 	{
 				yyval.parseTree=setLeft("declaration_list","declaration_list : ID LSQUARE CONST_INT RSQUARE");
 				fprintf(logout,"declaration_list : ID LSQUARE CONST_INT RSQUARE \n");
 				temp = yystack.l_mark[-3].symbolInfo;
 				table->Insert(temp->getName(),type);
-				yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(new ParseTree("","LTHIRD : [")); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(new ParseTree("","RTHIRD : ]"));
-				yyval.parseTree->setStartLine(start_line);
-				yyval.parseTree->setEndLine(line_count);
+				temp = table->Lookup(yystack.l_mark[-3].symbolInfo->getName());
+				temp->setArray();
+				yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+				yyval.parseTree->setStartLine(yystack.l_mark[-3].symbolInfo->getStartLine());
+				yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());	
 		  }
-#line 1815 "y.tab.c"
+#line 1926 "y.tab.c"
 break;
-case 25:
-#line 312 "parser.y"
+case 29:
+#line 351 "parser.y"
 	{
 		yyval.parseTree=setLeft("statements","statements : statement");
 		fprintf(logout,"statements : statement  \n");
 		yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 		yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-		yyval.parseTree->setEndLine(line_count);
-		insertParameters();
+		yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 		}
-#line 1827 "y.tab.c"
+#line 1937 "y.tab.c"
 break;
-case 26:
-#line 320 "parser.y"
+case 30:
+#line 358 "parser.y"
 	{
 		yyval.parseTree=setLeft("statements","statements : statements statement");
 		fprintf(logout,"statements : statements statement  \n");
 		yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 		yyval.parseTree->setStartLine(yystack.l_mark[-1].parseTree->getStartLine());
-		yyval.parseTree->setEndLine(line_count);
-		insertParameters();
+		yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 	   }
-#line 1839 "y.tab.c"
+#line 1948 "y.tab.c"
 break;
-case 27:
-#line 330 "parser.y"
+case 31:
+#line 367 "parser.y"
 	{
 			yyval.parseTree=setLeft("statement","statement : var_declaration");
 			fprintf(logout,"statement : var_declaration \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 			}
-#line 1850 "y.tab.c"
+#line 1960 "y.tab.c"
 break;
-case 28:
-#line 337 "parser.y"
+case 32:
+#line 375 "parser.y"
 	{
 			yyval.parseTree=setLeft("statement","statement : expression_statement");
 			fprintf(logout,"statement : expression_statement  \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 	  		}
-#line 1861 "y.tab.c"
+#line 1972 "y.tab.c"
 break;
-case 29:
-#line 344 "parser.y"
+case 33:
+#line 383 "parser.y"
 	{
 			yyval.parseTree=setLeft("statement","statement : compound_statement");
 			fprintf(logout,"statement : compound_statement  \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 	  		}
-#line 1872 "y.tab.c"
+#line 1984 "y.tab.c"
 break;
-case 30:
-#line 351 "parser.y"
+case 34:
+#line 391 "parser.y"
 	{
 			yyval.parseTree=setLeft("statement","statement : FOR LPAREN expression_statement expression_statement expression RPAREN statement");
 			fprintf(logout,"statement : FOR LPAREN expression_statement expression_statement expression RPAREN statement  \n");
-			yyval.parseTree->addChild(new ParseTree("","FOR : for")); yyval.parseTree->addChild(new ParseTree("","LPAREN : (")); yyval.parseTree->addChild(yystack.l_mark[-4].parseTree);
-			yyval.parseTree->addChild(yystack.l_mark[-3].parseTree); yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(new ParseTree("","RPAREN : )")); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-6].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-5].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-4].parseTree);
+			yyval.parseTree->addChild(yystack.l_mark[-3].parseTree); yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
+			yyval.parseTree->setStartLine(yystack.l_mark[-6].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 	  		}
-#line 1884 "y.tab.c"
+#line 1997 "y.tab.c"
 break;
-case 31:
-#line 359 "parser.y"
+case 35:
+#line 400 "parser.y"
 	{
 			yyval.parseTree=setLeft("statement","statement : IF LPAREN expression RPAREN statement");
 			fprintf(logout,"statement : IF LPAREN expression RPAREN statement  \n");
-			yyval.parseTree->addChild(new ParseTree("","IF : if")); yyval.parseTree->addChild(new ParseTree("","LPAREN : (")); yyval.parseTree->addChild(yystack.l_mark[-2].parseTree);
-			yyval.parseTree->addChild(new ParseTree("","RPAREN : )")); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-4].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-2].parseTree);
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
+			yyval.parseTree->setStartLine(yystack.l_mark[-4].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 	  		}
-#line 1896 "y.tab.c"
+#line 2010 "y.tab.c"
 break;
-case 32:
-#line 367 "parser.y"
+case 36:
+#line 409 "parser.y"
 	{
 			yyval.parseTree=setLeft("statement","statement : IF LPAREN expression RPAREN statement ELSE statement");
 			fprintf(logout,"statement : IF LPAREN expression RPAREN statement ELSE statement  \n");
-			yyval.parseTree->addChild(new ParseTree("","IF : if")); yyval.parseTree->addChild(new ParseTree("","LPAREN : (")); yyval.parseTree->addChild(yystack.l_mark[-4].parseTree);
-			yyval.parseTree->addChild(new ParseTree("","RPAREN : )")); yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(new ParseTree("","ELSE : else")); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-6].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-5].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-4].parseTree);
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
+			yyval.parseTree->setStartLine(yystack.l_mark[-6].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 	  		}
-#line 1908 "y.tab.c"
+#line 2023 "y.tab.c"
 break;
-case 33:
-#line 375 "parser.y"
+case 37:
+#line 418 "parser.y"
 	{
 			yyval.parseTree=setLeft("statement","statement : WHILE LPAREN expression RPAREN statement");
 			fprintf(logout,"statement : WHILE LPAREN expression RPAREN statement  \n");
-			yyval.parseTree->addChild(new ParseTree("","WHILE : while")); yyval.parseTree->addChild(new ParseTree("","LPAREN : (")); yyval.parseTree->addChild(yystack.l_mark[-2].parseTree);
-			yyval.parseTree->addChild(new ParseTree("","RPAREN : )")); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-4].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-2].parseTree);
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree); 
+			yyval.parseTree->setStartLine(yystack.l_mark[-4].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 	  		}
-#line 1921 "y.tab.c"
+#line 2035 "y.tab.c"
 break;
-case 34:
-#line 384 "parser.y"
+case 38:
+#line 426 "parser.y"
 	{
 			yyval.parseTree=setLeft("statement","statement : PRINTLN LPAREN ID RPAREN SEMICOLON");			
 			fprintf(logout,"statement : PRINTLN LPAREN ID RPAREN SEMICOLON  \n");
-			yyval.parseTree->addChild(new ParseTree("","PRINTLN : println")); yyval.parseTree->addChild(new ParseTree("","LPAREN : (")); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo));
-			yyval.parseTree->addChild(new ParseTree("","RPAREN : )")); yyval.parseTree->addChild(new ParseTree("","SEMICOLON : ;"));
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-4].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo));
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo)); 
+			yyval.parseTree->setStartLine(yystack.l_mark[-4].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 	  		}
-#line 1934 "y.tab.c"
+#line 2047 "y.tab.c"
 break;
-case 35:
-#line 393 "parser.y"
+case 39:
+#line 434 "parser.y"
 	{
 			yyval.parseTree=setLeft("statement","statement : RETURN expression SEMICOLON");
 			fprintf(logout,"statement : RETURN expression SEMICOLON  \n");
-			yyval.parseTree->addChild(new ParseTree("","RETURN : return")); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(new ParseTree("","SEMICOLON : ;"));
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+			yyval.parseTree->setStartLine(yystack.l_mark[-2].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 	  		}
-#line 1946 "y.tab.c"
+#line 2058 "y.tab.c"
 break;
-case 36:
-#line 403 "parser.y"
+case 40:
+#line 443 "parser.y"
 	{
 			yyval.parseTree=setLeft("expression_statement","expression_statement : SEMICOLON");
 			fprintf(logout,"expression_statement : SEMICOLON\n");
-			yyval.parseTree->addChild(new ParseTree("","SEMICOLON : ;"));
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+			yyval.parseTree->setStartLine(yystack.l_mark[0].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
+
 			}
-#line 1957 "y.tab.c"
+#line 2070 "y.tab.c"
 break;
-case 37:
-#line 410 "parser.y"
+case 41:
+#line 451 "parser.y"
 	{
 			yyval.parseTree=setLeft("expression_statement","expression_statement : expression SEMICOLON");
 			fprintf(logout,"expression_statement : expression SEMICOLON\n");
-			yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(new ParseTree("","SEMICOLON : ;"));
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+			yyval.parseTree->setStartLine(yystack.l_mark[-1].parseTree->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
+
 			}
-#line 1968 "y.tab.c"
+#line 2082 "y.tab.c"
 break;
-case 38:
-#line 419 "parser.y"
+case 42:
+#line 461 "parser.y"
 	{
 		yyval.parseTree=setLeft("variable","variable : ID");
 		fprintf(logout,"variable : ID 	 \n");
 		yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
-		yyval.parseTree->setStartLine(start_line);
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree->setStartLine(yystack.l_mark[0].symbolInfo->getStartLine());
+		yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 		}
-#line 1979 "y.tab.c"
+#line 2093 "y.tab.c"
 break;
-case 39:
-#line 426 "parser.y"
+case 43:
+#line 468 "parser.y"
 	{
 		yyval.parseTree=setLeft("variable","variable : ID LSQUARE expression RSQUARE");
 		fprintf(logout,"variable : ID LSQUARE expression RSQUARE  	 \n");
-		yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(new ParseTree("","LTHIRD : [")); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(new ParseTree("","RTHIRD : ]"));
-		yyval.parseTree->setStartLine(start_line);
-		yyval.parseTree->setEndLine(line_count);
+		yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+		yyval.parseTree->setStartLine(yystack.l_mark[-3].symbolInfo->getStartLine());
+		yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 	 }
-#line 1990 "y.tab.c"
+#line 2104 "y.tab.c"
 break;
-case 40:
-#line 435 "parser.y"
+case 44:
+#line 477 "parser.y"
 	{
 			yyval.parseTree=setLeft("expression","expression 	: logic_expression");
 			fprintf(logout,"expression 	: logic_expression	 \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 	 		}
-#line 2001 "y.tab.c"
+#line 2115 "y.tab.c"
 break;
-case 41:
-#line 442 "parser.y"
+case 45:
+#line 484 "parser.y"
 	{
 			yyval.parseTree=setLeft("expression","expression 	: variable ASSIGNOP logic_expression");
 			fprintf(logout,"expression 	: variable ASSIGNOP logic_expression 		 \n");
 			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[-2].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 	   		}
-#line 2012 "y.tab.c"
+#line 2127 "y.tab.c"
 break;
-case 42:
-#line 451 "parser.y"
+case 46:
+#line 494 "parser.y"
 	{
 			yyval.parseTree=setLeft("logic_expression","logic_expression : rel_expression");
 			fprintf(logout,"logic_expression : rel_expression 	 \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 			}
-#line 2023 "y.tab.c"
+#line 2139 "y.tab.c"
 break;
-case 43:
-#line 458 "parser.y"
+case 47:
+#line 502 "parser.y"
 	{
 			yyval.parseTree=setLeft("logic_expression","logic_expression : rel_expression LOGICOP rel_expression");
 			fprintf(logout,"logic_expression : rel_expression LOGICOP rel_expression 	 	 \n");
 			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[-2].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 		 	}
-#line 2034 "y.tab.c"
+#line 2151 "y.tab.c"
 break;
-case 44:
-#line 467 "parser.y"
+case 48:
+#line 512 "parser.y"
 	{
 			yyval.parseTree=setLeft("rel_expression","rel_expression	: simple_expression");
 			fprintf(logout,"rel_expression	: simple_expression \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 			}
-#line 2045 "y.tab.c"
+#line 2163 "y.tab.c"
 break;
-case 45:
-#line 474 "parser.y"
+case 49:
+#line 520 "parser.y"
 	{
 			yyval.parseTree=setLeft("rel_expression","rel_expression	: simple_expression RELOP simple_expression");
 			fprintf(logout,"rel_expression	: simple_expression RELOP simple_expression	\n");
 			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[-2].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 		}
-#line 2056 "y.tab.c"
+#line 2175 "y.tab.c"
 break;
-case 46:
-#line 483 "parser.y"
+case 50:
+#line 530 "parser.y"
 	{
 			yyval.parseTree=setLeft("simple_expression","simple_expression : term");
 			fprintf(logout,"simple_expression : term \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 			}
-#line 2066 "y.tab.c"
+#line 2186 "y.tab.c"
 break;
-case 47:
-#line 489 "parser.y"
+case 51:
+#line 537 "parser.y"
 	{
 			yyval.parseTree=setLeft("simple_expression","simple_expression :	simple_expression ADDOP term");
 			fprintf(logout,"simple_expression :	simple_expression ADDOP term \n");
 			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[-2].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 		  }
-#line 2077 "y.tab.c"
+#line 2198 "y.tab.c"
 break;
-case 48:
-#line 498 "parser.y"
+case 52:
+#line 547 "parser.y"
 	{
 			yyval.parseTree=setLeft("term","term :	unary_expression");
 			fprintf(logout,"term :	unary_expression \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 
 			}
-#line 2089 "y.tab.c"
+#line 2211 "y.tab.c"
 break;
-case 49:
-#line 506 "parser.y"
+case 53:
+#line 556 "parser.y"
 	{
 			yyval.parseTree=setLeft("term","term : term MULOP unary_expression");
 			fprintf(logout,"term : term MULOP unary_expression \n");
 			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[-2].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
+
 	 }
-#line 2100 "y.tab.c"
+#line 2223 "y.tab.c"
 break;
-case 50:
-#line 515 "parser.y"
+case 54:
+#line 566 "parser.y"
 	{
 			yyval.parseTree=setLeft("unary_expression","unary_expression : ADDOP unary_expression");
 			fprintf(logout,"unary_expression : ADDOP unary_expression  \n");
 			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setStartLine(yystack.l_mark[-1].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 			}
-#line 2112 "y.tab.c"
+#line 2234 "y.tab.c"
 break;
-case 51:
-#line 523 "parser.y"
+case 55:
+#line 573 "parser.y"
 	{
 			yyval.parseTree=setLeft("unary_expression","unary_expression : NOT unary_expression");
 			fprintf(logout,"unary_expression : NOT unary_expression \n");
 			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setStartLine(yystack.l_mark[-1].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 		 	}
-#line 2124 "y.tab.c"
+#line 2245 "y.tab.c"
 break;
-case 52:
-#line 531 "parser.y"
+case 56:
+#line 580 "parser.y"
 	{
 			yyval.parseTree=setLeft("unary_expression","unary_expression : factor");
 			fprintf(logout,"unary_expression : factor \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 		 	}
-#line 2136 "y.tab.c"
+#line 2256 "y.tab.c"
 break;
-case 53:
-#line 541 "parser.y"
+case 57:
+#line 589 "parser.y"
 	{
 			yyval.parseTree=setLeft("factor","factor : variable");
 			fprintf(logout,"factor : variable  \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 			}
-#line 2148 "y.tab.c"
+#line 2267 "y.tab.c"
 break;
-case 54:
-#line 549 "parser.y"
+case 58:
+#line 596 "parser.y"
 	{
 			yyval.parseTree=setLeft("factor","factor	: ID LPAREN argument_list RPAREN");
 			fprintf(logout,"factor	: ID LPAREN argument_list RPAREN  \n");
-			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(new ParseTree("","LPAREN : (")); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(new ParseTree("","RPAREN : )"));
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-3].symbolInfo)); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+			yyval.parseTree->setStartLine(yystack.l_mark[-3].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 			}
-#line 2159 "y.tab.c"
+#line 2278 "y.tab.c"
 break;
-case 55:
-#line 556 "parser.y"
+case 59:
+#line 603 "parser.y"
 	{
 			yyval.parseTree=setLeft("factor","factor	: LPAREN expression RPAREN");
 			fprintf(logout,"factor	: LPAREN expression RPAREN   \n");
-			yyval.parseTree->addChild(new ParseTree("","LPAREN : (")); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(new ParseTree("","RPAREN : )"));
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
+			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-2].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
+			yyval.parseTree->setStartLine(yystack.l_mark[-2].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 			}
-#line 2170 "y.tab.c"
+#line 2289 "y.tab.c"
 break;
-case 56:
-#line 563 "parser.y"
+case 60:
+#line 610 "parser.y"
 	{
 			yyval.parseTree=setLeft("factor","factor	: CONST_INT");
 			fprintf(logout,"factor	: CONST_INT   \n");
 			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setStartLine(yystack.l_mark[0].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 			}
-#line 2182 "y.tab.c"
+#line 2300 "y.tab.c"
 break;
-case 57:
-#line 571 "parser.y"
+case 61:
+#line 617 "parser.y"
 	{
 			yyval.parseTree=setLeft("factor","factor	: CONST_FLOAT");
 			fprintf(logout,"factor	: CONST_FLOAT   \n");
 			yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
-			yyval.parseTree->setStartLine(start_line);
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setStartLine(yystack.l_mark[0].symbolInfo->getStartLine());
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 			}
-#line 2194 "y.tab.c"
+#line 2311 "y.tab.c"
 break;
-case 58:
-#line 579 "parser.y"
+case 62:
+#line 624 "parser.y"
 	{
 			yyval.parseTree=setLeft("factor","factor	: variable INCOP");
 			fprintf(logout,"factor	: variable INCOP  \n");
 			yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
 			yyval.parseTree->setStartLine(yystack.l_mark[-1].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 			}
-#line 2206 "y.tab.c"
+#line 2322 "y.tab.c"
 break;
-case 59:
-#line 587 "parser.y"
+case 63:
+#line 631 "parser.y"
 	{
 			yyval.parseTree=setLeft("factor","factor	: variable DECOP");
 			fprintf(logout,"factor	: variable DECOP  \n");
 			yyval.parseTree->addChild(yystack.l_mark[-1].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[0].symbolInfo));
 			yyval.parseTree->setStartLine(yystack.l_mark[-1].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setEndLine(yystack.l_mark[0].symbolInfo->getEndLine());
 			}
-#line 2218 "y.tab.c"
+#line 2333 "y.tab.c"
 break;
-case 60:
-#line 597 "parser.y"
+case 64:
+#line 640 "parser.y"
 	{
 			yyval.parseTree=setLeft("argument_list","argument_list : arguments");
 			fprintf(logout,"argument_list : arguments  \n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 			}
-#line 2230 "y.tab.c"
+#line 2344 "y.tab.c"
 break;
-case 61:
-#line 605 "parser.y"
+case 65:
+#line 647 "parser.y"
 	{
 			yyval.parseTree=setLeft("argument_list","argument_list :");
 			fprintf(logout,"argument_list :\n");
-			yyval.parseTree->addChild(new ParseTree("",""));
+			yyval.parseTree->addChild(new ParseTree("","",line_count));
 			yyval.parseTree->setStartLine(line_count);
 			yyval.parseTree->setEndLine(line_count);
-
 			}
-#line 2242 "y.tab.c"
+#line 2355 "y.tab.c"
 break;
-case 62:
-#line 615 "parser.y"
+case 66:
+#line 656 "parser.y"
 	{
 			yyval.parseTree=setLeft("arguments","arguments : arguments COMMA logic_expression");
 			fprintf(logout,"arguments : arguments COMMA logic_expression \n");
-			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(new ParseTree("","COMMA : ,")); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
+			yyval.parseTree->addChild(yystack.l_mark[-2].parseTree); yyval.parseTree->addChild(symbolToParse(yystack.l_mark[-1].symbolInfo)); yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[-2].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 			}
-#line 2254 "y.tab.c"
+#line 2366 "y.tab.c"
 break;
-case 63:
-#line 623 "parser.y"
+case 67:
+#line 663 "parser.y"
 	{
 			yyval.parseTree=setLeft("arguments","arguments : logic_expression");
 			fprintf(logout,"arguments : logic_expression\n");
 			yyval.parseTree->addChild(yystack.l_mark[0].parseTree);
 			yyval.parseTree->setStartLine(yystack.l_mark[0].parseTree->getStartLine());
-			yyval.parseTree->setEndLine(line_count);
-
+			yyval.parseTree->setEndLine(yystack.l_mark[0].parseTree->getEndLine());
 		  }
-#line 2266 "y.tab.c"
+#line 2377 "y.tab.c"
 break;
-#line 2268 "y.tab.c"
+#line 2379 "y.tab.c"
     default:
         break;
     }

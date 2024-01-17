@@ -72,7 +72,7 @@ compound_statement : LCURL statements RCURL
 	ScopeTable# 1
 	1 --> <y,INT>
 	2 --> <z,INT>
-	6 --> <foo,FUNCTION>
+	6 --> <foo,FUNCTION,VOID>
 	10 --> <a,FLOAT>
 	11 --> <x,INT>
 func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement 
@@ -127,7 +127,7 @@ compound_statement : LCURL statements RCURL
 	ScopeTable# 1
 	1 --> <y,INT>
 	2 --> <z,INT>
-	6 --> <foo,FUNCTION> --> <var,FUNCTION>
+	6 --> <foo,FUNCTION,VOID> <var,FUNCTION,INT>
 	10 --> <a,FLOAT>
 	11 --> <x,INT>
 func_definition : type_specifier ID LPAREN RPAREN compound_statement
@@ -388,16 +388,16 @@ compound_statement : LCURL statements RCURL
 	2 --> <d,FLOAT>
 	7 --> <i,INT>
 	8 --> <j,INT>
-	10 --> <a,INT>
+	10 --> <a,ARRAY>
 	ScopeTable# 1
 	1 --> <y,INT>
 	2 --> <z,INT>
-	6 --> <foo,FUNCTION> --> <var,FUNCTION>
+	6 --> <foo,FUNCTION,VOID> <var,FUNCTION,INT>
 	10 --> <a,FLOAT>
 	11 --> <x,INT>
 func_definition : type_specifier ID LPAREN RPAREN compound_statement
 unit : func_definition  
 program : program unit 
 start : program 
-Total lines: 23
-Total errors: 0
+Total Lines: 23
+Total Errors: 0
