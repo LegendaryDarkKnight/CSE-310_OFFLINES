@@ -18,6 +18,7 @@ bool sayArray = false;
 MyStack1 stack1, stack2;
 bool stillValid = true;
 int validCount = 0;
+vector<string> typeList;
 
 FILE *fp;
 FILE *logout;
@@ -38,6 +39,7 @@ void yyerror(char *s)
 	validCount = 0;
 	stack1.cleanUp();
 	stack2.cleanUp();
+	typeList.clear();
 }
 bool voidCheck(string type1, string name, int line){
 	if(type1=="VOID"){
@@ -98,13 +100,13 @@ void insertParameters(){
 
 bool redefinitionCheck(string name, string type, int line){
 	temp = table->Lookup(name);
-	if(temp!= nullptr){
-		if(temp->getType()==type){
-		fprintf(errorout,"Line# %d: Redefinition of variable '%s'\n",line,name.c_str());
-		err_count++;
-		return true;
-		}
-	}
+	// if(temp!= nullptr){
+	// 	if(temp->getType()==type){
+	// 	fprintf(errorout,"Line# %d: Redefinition of variable '%s'\n",line,name.c_str());
+	// 	err_count++;
+	// 	return true;
+	// 	}
+	// }
 	return false;
 }
 bool redefinitionCheckFunc(string name, string type1, int line){
@@ -169,7 +171,40 @@ void lookForVariable(SymbolInfo *s, int line){
 		err_count++;
 	}
 }
+void checkVoidInExpression(ParseTree *p){
 
+}
+void balanceAssign(){
+
+}
+void functionChecker(SymbolInfo *s, vector<string> &v){
+	cout<<s->getType()<<endl;
+	if(!s->isFunc() ){
+		if(s->getType() != "ID"){
+		fprintf(errorout,"Line %d: '%s' is not a function\n", s->getStartLine(), s->getName().c_str());
+		err_count++;
+		}
+	}
+    else if(v.size()<s->getExtra()->getNumber()){
+        fprintf(errorout,"Line %d: Too few arguments to function '%s'\n", s->getStartLine(), s->getName().c_str());
+		err_count++;
+    }
+    else if(v.size() > s->getExtra()->getNumber()){
+        fprintf(errorout,"Line %d: Too many arguments to function '%s'\n", s->getStartLine(), s->getName().c_str());
+		err_count++;
+    }
+    else {
+        vector<Pair *> temp = s->getExtra()->getParameterList();
+        for(int i=0; i<v.size(); i++){
+            if(v[i]!=temp[i]->getType()){
+                fprintf(errorout,"Line# %d: Type mismatch for argument %d of '%s'\n", s->getStartLine(), i+1, s->getName().c_str());
+				err_count++;
+            }
+        }
+
+    }
+	v.clear();
+}
 %}
 
 %union {
@@ -555,7 +590,7 @@ expression_statement : SEMICOLON{
 			;
 	  
 variable : ID{
-		$$=setLeft("variable","variable : ID");
+		$$=setLeft($1->getType(),"variable : ID");
 		fprintf(logout,"variable : ID 	 \n");
 		lookForVariable($1,$1->getStartLine());
 		$$->addChild(symbolToParse($1));
@@ -563,9 +598,10 @@ variable : ID{
 		$$->setEndLine($1->getEndLine());
 		} 		
 	 	| ID LTHIRD expression RTHIRD{
-		$$=setLeft("variable","variable : ID LSQUARE expression RSQUARE");
-		fprintf(logout,"variable : ID LSQUARE expression RSQUARE  	 \n");
+		$$=setLeft($1->getType(),"variable : ID LSQUARE expression RSQUARE");
+		fprintf(logout,"variable : ID LSQUARE expression RSQUARE \n");
 		lookForVariable($1,$1->getStartLine());
+		if($3->getType() != "INT") {fprintf(errorout,"Line# %d: Array subscript is not an integer\n", $3->getStartLine()); err_count++;}
 		$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild($3); $$->addChild(symbolToParse($4));
 		$$->setStartLine($1->getStartLine());
 		$$->setEndLine($4->getEndLine());
@@ -573,42 +609,39 @@ variable : ID{
 	 ;
 	 
 expression : logic_expression{
-			$$=setLeft("expression","expression 	: logic_expression");
-			fprintf(logout,"expression 	: logic_expression	 \n");
+			$$=setLeft($1->getType(),"expression : logic_expression");
+			fprintf(logout,"expression 	: logic_expression\n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
 	 		}
 	   		| variable ASSIGNOP logic_expression{
-			$$=setLeft("expression","expression 	: variable ASSIGNOP logic_expression");
-			fprintf(logout,"expression 	: variable ASSIGNOP logic_expression 		 \n");
+			$$=setLeft($1->getType(),"expression : variable ASSIGNOP logic_expression");
+			fprintf(logout,"expression 	: variable ASSIGNOP logic_expression \n");
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
-
 	   		}	
 	   		;
 			
 logic_expression : rel_expression 	{
-			$$=setLeft("logic_expression","logic_expression : rel_expression");
+			$$=setLeft($1->getType(),"logic_expression : rel_expression");
 			fprintf(logout,"logic_expression : rel_expression 	 \n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
-
 			}
 			 | rel_expression LOGICOP rel_expression {
-			$$=setLeft("logic_expression","logic_expression : rel_expression LOGICOP rel_expression");
-			fprintf(logout,"logic_expression : rel_expression LOGICOP rel_expression 	 	 \n");
+			$$=setLeft("INT","logic_expression : rel_expression LOGICOP rel_expression");
+			fprintf(logout,"logic_expression : rel_expression LOGICOP rel_expression\n");
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
-
 		 	}
 		 	;
 			
 rel_expression	: simple_expression {
-			$$=setLeft("rel_expression","rel_expression	: simple_expression");
+			$$=setLeft($1->getType(),"rel_expression : simple_expression");
 			fprintf(logout,"rel_expression	: simple_expression \n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
@@ -616,65 +649,62 @@ rel_expression	: simple_expression {
 
 			}
 			| simple_expression RELOP simple_expression	{
-			$$=setLeft("rel_expression","rel_expression	: simple_expression RELOP simple_expression");
+			$$=setLeft("INT","rel_expression : simple_expression RELOP simple_expression");
 			fprintf(logout,"rel_expression	: simple_expression RELOP simple_expression	\n");
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
-
 		}
 		;
 				
 simple_expression : term {
-			$$=setLeft("simple_expression","simple_expression : term");
+			$$=setLeft($1->getType(),"simple_expression : term");
 			fprintf(logout,"simple_expression : term \n");
 			$$->addChild($1);
 			$$->setEndLine($1->getEndLine());
 
 			}	
 		  	| simple_expression ADDOP term {
-			$$=setLeft("simple_expression","simple_expression :	simple_expression ADDOP term");
+			$$=setLeft($1->getType(),"simple_expression :	simple_expression ADDOP term");
 			fprintf(logout,"simple_expression :	simple_expression ADDOP term \n");
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
-
 		  }
 		  ;
 					
 term :	unary_expression {
-			$$=setLeft("term","term :	unary_expression");
+			$$=setLeft($1->getType(),"term :	unary_expression");
 			fprintf(logout,"term :	unary_expression \n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
 			}
      		|  term MULOP unary_expression {
-			$$=setLeft("term","term : term MULOP unary_expression");
+			$$=setLeft($1->getType(),"term : term MULOP unary_expression");
 			fprintf(logout,"term : term MULOP unary_expression \n");
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
-
 	 }
      ;
 
 unary_expression : ADDOP unary_expression  {
-			$$=setLeft("unary_expression","unary_expression : ADDOP unary_expression");
+			$$=setLeft($2->getType(),"unary_expression : ADDOP unary_expression");
 			fprintf(logout,"unary_expression : ADDOP unary_expression  \n");
 			$$->addChild(symbolToParse($1)); $$->addChild($2);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($2->getEndLine());
 			}
 		 	| NOT unary_expression {
-			$$=setLeft("unary_expression","unary_expression : NOT unary_expression");
+			$$=setLeft($2->getType(),"unary_expression : NOT unary_expression");
 			fprintf(logout,"unary_expression : NOT unary_expression \n");
 			$$->addChild(symbolToParse($1)); $$->addChild($2);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($2->getEndLine());
 		 	}
 		 	| factor {
-			$$=setLeft("unary_expression","unary_expression : factor");
+			$$=setLeft($1->getType(),"unary_expression : factor");
 			fprintf(logout,"unary_expression : factor \n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
@@ -683,50 +713,58 @@ unary_expression : ADDOP unary_expression  {
 		 	;
 	
 factor	: variable {
-			$$=setLeft("factor","factor : variable");
+			$$=setLeft($1->getType(),"factor : variable");
 			fprintf(logout,"factor : variable  \n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
 			}
 			| ID LPAREN argument_list RPAREN {
-			$$=setLeft("factor","factor	: ID LPAREN argument_list RPAREN");
+			string testType;
+			if($1->isFunc()){
+				testType = $1->getExtra()->getReturnType();
+			}
+			else{
+				testType = $1->getType();
+			}
+			$$=setLeft(testType,"factor	: ID LPAREN argument_list RPAREN");
 			fprintf(logout,"factor	: ID LPAREN argument_list RPAREN  \n");
 			lookForVariable($1,$1->getStartLine());
+			functionChecker($1,typeList);
 			$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild($3); $$->addChild(symbolToParse($4));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($4->getEndLine());
 			}
 			| LPAREN expression RPAREN {
-			$$=setLeft("factor","factor	: LPAREN expression RPAREN");
+			$$=setLeft($2->getType(),"factor	: LPAREN expression RPAREN");
 			fprintf(logout,"factor	: LPAREN expression RPAREN   \n");
 			$$->addChild(symbolToParse($1)); $$->addChild($2); $$->addChild(symbolToParse($3));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
 			}
 			| CONST_INT {
-			$$=setLeft("factor","factor	: CONST_INT");
-			fprintf(logout,"factor	: CONST_INT   \n");
+			$$=setLeft("INT","factor : CONST_INT");
+			fprintf(logout,"factor : CONST_INT\n");
 			$$->addChild(symbolToParse($1));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
 			}
 			| CONST_FLOAT {
-			$$=setLeft("factor","factor	: CONST_FLOAT");
+			$$=setLeft("FLOAT","factor	: CONST_FLOAT");
 			fprintf(logout,"factor	: CONST_FLOAT   \n");
 			$$->addChild(symbolToParse($1));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
 			}
 			| variable INCOP {
-			$$=setLeft("factor","factor	: variable INCOP");
+			$$=setLeft($1->getType(),"factor	: variable INCOP");
 			fprintf(logout,"factor	: variable INCOP  \n");
 			$$->addChild($1); $$->addChild(symbolToParse($2));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($2->getEndLine());
 			}
 			| variable DECOP {
-			$$=setLeft("factor","factor	: variable DECOP");
+			$$=setLeft($1->getType(),"factor	: variable DECOP");
 			fprintf(logout,"factor	: variable DECOP  \n");
 			$$->addChild($1); $$->addChild(symbolToParse($2));
 			$$->setStartLine($1->getStartLine());
@@ -735,14 +773,14 @@ factor	: variable {
 			;
 	
 argument_list : arguments{
-			$$=setLeft("argument_list","argument_list : arguments");
+			$$=setLeft($1->getType(),"argument_list : arguments");
 			fprintf(logout,"argument_list : arguments  \n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
 			}
 			  | {
-			$$=setLeft("argument_list","argument_list :");
+			$$=setLeft("VOID","argument_list :");
 			fprintf(logout,"argument_list :\n");
 			$$->addChild(new ParseTree("","",line_count));
 			$$->setStartLine(line_count);
@@ -751,14 +789,16 @@ argument_list : arguments{
 			;
 	
 arguments : arguments COMMA logic_expression {
-			$$=setLeft("arguments","arguments : arguments COMMA logic_expression");
+			$$=setLeft($1->getType(),"arguments : arguments COMMA logic_expression");
+			typeList.push_back($3->getType());
 			fprintf(logout,"arguments : arguments COMMA logic_expression \n");
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
 			}
 	      | logic_expression {
-			$$=setLeft("arguments","arguments : logic_expression");
+			typeList.push_back($1->getType());
+			$$=setLeft($1->getType(),"arguments : logic_expression");
 			fprintf(logout,"arguments : logic_expression\n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());

@@ -1,10 +1,8 @@
-int f(int a, int a, float b){
+int f(int a, int b, int c){
 
 }
+int x;
 
-int fa(void a){
-    
-}
 int main(){
-
+    x = f(1,2.0,3.1);
 }

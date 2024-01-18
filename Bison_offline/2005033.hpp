@@ -57,6 +57,9 @@ public:
     string getType(){
         return type;
     }
+    void setType(string type){
+        this->type = type;
+    }
     void setLine(string line){
         this->line = line;
     }

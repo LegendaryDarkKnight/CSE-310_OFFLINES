@@ -5,7 +5,13 @@ Line# 32: Conflicting types for 'var'
 Line# 42: Variable or field 'e' declared void
 Line# 43: Conflicting types for 'a'
 Line# 43: Conflicting types for 'c'
+Line# 45: Type mismatch for argument 1 of 'func'
+Line# 45: Type mismatch for argument 2 of 'func'
+Line# 48: Type mismatch for argument 2 of 'correct_foo'
+Line 49: Too few arguments to function 'correct_foo'
+Line 50: Too many arguments to function 'correct_foo'
 Line# 52: Undeclared variable 'k'
+Line# 54: Array subscript is not an integer
 Line# 63: Undeclared variable 'foo5'
 Line# 68: Undeclared variable 'h'
 Line# 68: Undeclared variable 'printf'
