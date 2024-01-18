@@ -410,6 +410,7 @@ public:
 class MyStack
 {
     SymbolInfo *head;
+    int count = 0;
 
 public:
     MyStack()
@@ -425,9 +426,11 @@ public:
         if (head == nullptr)
         {
             head = s;
+            count++;
             return;
         }
         s->setNext(head);
+        count++;
         head = s;
     }
     SymbolInfo *pop()
@@ -436,6 +439,7 @@ public:
             return nullptr;
         SymbolInfo *temp = head;
         head = head->getNext();
+        count--;
         return temp;
     }
     void cleanUp()
@@ -449,10 +453,14 @@ public:
             temp = nullptr;
         }
         head = nullptr;
+        count = 0;
     }
     bool isEmpty()
     {
         return head == nullptr;
+    }
+    int size(){
+        return count;
     }
 };
 

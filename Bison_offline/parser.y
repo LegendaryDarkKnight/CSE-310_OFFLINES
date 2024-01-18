@@ -14,7 +14,8 @@ extern int line_count;
 extern int err_count;
 extern int start_line;
 bool infunc = false;
-MyStack stack1;
+bool sayArray = false;
+MyStack stack1, stack2;
 
 FILE *fp;
 FILE *logout;
@@ -31,13 +32,15 @@ void yyerror(char *s)
 	fprintf(logout,"Error at line %d: %s\n",line_count,s);
 	infunc = false;	
 	stack1.cleanUp();
+	stack2.cleanUp();
 }
 
 FuncExtras *addExtraInFunc(string type, bool defined){
 	vector<Pair *> p;
 	SymbolInfo *s;
-	while(!stack1.isEmpty()){
-		s = stack1.pop() ;
+	// fprintf(checkerout,"%d",stack2.size());
+	while(!stack2.isEmpty()){
+		s = stack2.pop() ;
 		p.push_back(new Pair(s->getName(), s->getType()));
 		s = nullptr;
 	}
@@ -69,6 +72,54 @@ void insertParameters(){
 }
 
 // error checking functions
+void conflictingType(SymbolInfo *s, int line, bool isfunc, string type1, bool define){ // boolean is func is used so that if we get ID type we may use 
+	// fprintf(checkerout,"%s %d %d\n",s->getType().c_str(),s->isFunc(),isfunc);
+	if(s->isFunc() and !isfunc){
+		if(!table->Insert(s->getName(),type)){
+			fprintf(errorout,"Line# %d: '%s' redeclared as different kind of symbol\n",line,s->getName().c_str());
+			err_count++;
+		}
+	}
+	else if(!s->isFunc() and isfunc){
+		// fprintf(checkerout,"%s %d %d\n",s->getType().c_str(),s->isFunc(),isfunc);
+		if(!table->Insert(s->getName(),"FUNCTION",addExtraInFunc(type1,define))){
+			fprintf(errorout,"Line# %d: '%s' redeclared as different kind of symbol\n",line,s->getName().c_str());
+			err_count++;
+		}
+	}
+	else if(s->isFunc()){
+		if(s->getExtra()->getDefinition()||s->getExtra()->getReturnType()!= type1 ||s->getExtra()->getNumber()!=stack2.size()){
+			fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
+			err_count++;
+		}
+		else if(!table->Insert(s->getName(),"FUNCTION",addExtraInFunc(type1,define)) && !define){
+			fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
+			err_count++;
+		}
+	}
+	else if(isfunc){
+		if(!table->Insert(s->getName(),"FUNCTION",addExtraInFunc(type1,define))){
+			fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
+			err_count++;
+		}
+	}
+	else if(sayArray && table->Insert(s->getName(),type)){
+		temp = table->Lookup(s->getName());
+		temp->setArray();
+		sayArray = false;
+	}
+	else if(!table->Insert(s->getName(),type)){
+		fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
+		err_count++;
+	}
+	
+}
+void lookForVariable(SymbolInfo *s, int line){
+	if(table->Lookup(s->getName())==nullptr){
+		fprintf(errorout,"Line# %d: Undeclared variable '%s'\n",line,s->getName().c_str());
+		err_count++;
+	}
+}
 void leftRightTypeChecking(){
 
 }
@@ -175,9 +226,10 @@ unit : var_declaration{
 	
 func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
 			$$ = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON");
-			fprintf(logout,"func_declaration : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
-			temp = $2;
-			table->Insert(temp->getName(),"FUNCTION", addExtraInFunc($1->getType(),false));
+			fprintf(logout,"func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON \n");
+			conflictingType($2,$1->getStartLine(),true,$1->getType(),false);
+			// temp = $2;
+			// table->Insert(temp->getName(),"FUNCTION", addExtraInFunc($1->getType(),false));
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild($4); $$->addChild(symbolToParse($5)); $$->addChild(symbolToParse($6));
 			$$->setStartLine($1->getStartLine());
@@ -187,8 +239,9 @@ func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
 		| type_specifier ID LPAREN RPAREN SEMICOLON{
 			$$ = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON");
 			fprintf(logout,"func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON \n");
-			temp = $2;
-			table->Insert(temp->getName(),"FUNCTION",addExtraInFunc($1->getType(),false));
+			conflictingType($2,$1->getStartLine(),true,$1->getType(),false);
+			// temp = $2;
+			// table->Insert(temp->getName(),"FUNCTION",addExtraInFunc($1->getType(),false));
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild(symbolToParse($4)); $$->addChild(symbolToParse($5));
 			$$->setStartLine($1->getStartLine());
@@ -199,8 +252,9 @@ func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
 func_definition : type_specifier ID LPAREN parameter_list RPAREN{infunc = true;} compound_statement{ //
 			$$ = setLeft("func_definition","func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement ");
 			fprintf(logout,"func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
-			temp = $2;
-			table->Insert(temp->getName(),"FUNCTION",addExtraInFunc($1->getType(),true));
+			conflictingType($2,$1->getStartLine(),true,$1->getType(),true);
+			// temp = $2;
+			// table->Insert(temp->getName(),"FUNCTION",addExtraInFunc($1->getType(),true));
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild($4); $$->addChild(symbolToParse($5)); $$->addChild($7);
 			$$->setStartLine($1->getStartLine());
@@ -210,8 +264,9 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN{infunc = true;}
 		| type_specifier ID LPAREN RPAREN{infunc = true;} compound_statement{
 			$$ = setLeft("func_definition","func_definition : type_specifier ID LPAREN RPAREN compound_statement ");
 			fprintf(logout,"func_definition : type_specifier ID LPAREN RPAREN compound_statement\n");
-			temp = $2;
-			table->Insert(temp->getName(),"FUNCTION",addExtraInFunc($1->getType(),true));
+			conflictingType($2,$1->getStartLine(),true,$1->getType(),true);
+			// temp = $2;
+			// table->Insert(temp->getName(),"FUNCTION",addExtraInFunc($1->getType(),true));
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild(symbolToParse($4)); $$->addChild($6);		
 			$$->setStartLine($1->getStartLine());
@@ -225,6 +280,7 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier ID\n");
 			temp = $4;
 			stack1.push(new SymbolInfo(temp->getName(), type));
+			stack2.push(new SymbolInfo(temp->getName(), type));
 			$$->addChild($1); $$->addChild(symbolToParse($2));
 			$$->addChild($3); $$->addChild(symbolToParse($4));
 			$$->setStartLine($1->getStartLine());	
@@ -234,6 +290,7 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 			$$ = setLeft("parameter_list", "parameter_list : parameter_list COMMA type_specifier");
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier\n");
 			stack1.push(new SymbolInfo("", type));
+			stack2.push(new SymbolInfo("", type));
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
@@ -243,6 +300,7 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 			fprintf(logout,"parameter_list  : type_specifier ID\n");
 			temp = $2;
 			stack1.push(new SymbolInfo(temp->getName(), type));
+			stack2.push(new SymbolInfo(temp->getName(), type));
 			$$->addChild($1); $$->addChild(symbolToParse($2));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($2->getEndLine());
@@ -309,8 +367,9 @@ type_specifier	: INT {
 declaration_list : declaration_list COMMA ID{
 				$$=setLeft("declaration_list","declaration_list : declaration_list COMMA ID");
 				fprintf(logout,"declaration_list : declaration_list COMMA ID \n");
-				temp = $3;
-				table->Insert(temp->getName(),type);
+				conflictingType($3,$1->getStartLine(),false,type,false);				
+				// temp = $3;
+				// table->Insert(temp->getName(),type);
 				$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 				$$->setStartLine($1->getStartLine());
 				$$->setEndLine($3->getEndLine());
@@ -318,8 +377,9 @@ declaration_list : declaration_list COMMA ID{
  		  		| declaration_list COMMA ID LTHIRD CONST_INT RTHIRD{
 				$$=setLeft("declaration_list","declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE");
 				fprintf(logout,"declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE \n");
-				temp = $3;
-				table->Insert(temp->getName(),type);
+				conflictingType($3,$1->getStartLine(),false,type,false);				
+				// temp = $3;
+				// table->Insert(temp->getName(),type);
 				$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 				$$->addChild(symbolToParse($4)); $$->addChild(symbolToParse($5)); $$->addChild(symbolToParse($6)); 
 				$$->setStartLine($1->getStartLine());
@@ -328,8 +388,9 @@ declaration_list : declaration_list COMMA ID{
  		  		| ID{
 				$$=setLeft("declaration_list", "declaration_list : ID");
 				fprintf(logout,"declaration_list : ID \n");
-				temp = $1;
-				table->Insert(temp->getName(),type);
+				conflictingType($1,$1->getStartLine(),false,type,false);				
+				// temp = $1;
+				// table->Insert(temp->getName(),type);
 				$$->addChild(symbolToParse($1));
 				$$->setStartLine($1->getStartLine());
 				$$->setEndLine($1->getEndLine());
@@ -338,14 +399,14 @@ declaration_list : declaration_list COMMA ID{
  		  		| ID LTHIRD CONST_INT RTHIRD{
 				$$=setLeft("declaration_list","declaration_list : ID LSQUARE CONST_INT RSQUARE");
 				fprintf(logout,"declaration_list : ID LSQUARE CONST_INT RSQUARE \n");
-				temp = $1;
-				table->Insert(temp->getName(),type);
-				temp = table->Lookup($1->getName());
-				temp->setArray();
+				sayArray = true;				
+				conflictingType($1,$1->getStartLine(),false,type,false);
+				// temp = $1;
+				// table->Insert(temp->getName(),type);
 				$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3)); $$->addChild(symbolToParse($4));
 				$$->setStartLine($1->getStartLine());
 				$$->setEndLine($4->getEndLine());	
-		  }
+		  		}	
  		  ;
  		  
 statements : statement{
@@ -426,6 +487,7 @@ statement : var_declaration {
 	  		| PRINTLN LPAREN ID RPAREN SEMICOLON{
 			$$=setLeft("statement","statement : PRINTLN LPAREN ID RPAREN SEMICOLON");			
 			fprintf(logout,"statement : PRINTLN LPAREN ID RPAREN SEMICOLON  \n");
+			lookForVariable($3,$1->getStartLine());
 			$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild(symbolToParse($4)); $$->addChild(symbolToParse($5)); 
 			$$->setStartLine($1->getStartLine());
@@ -446,7 +508,6 @@ expression_statement : SEMICOLON{
 			$$->addChild(symbolToParse($1));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
-
 			}			
 			| expression SEMICOLON{
 			$$=setLeft("expression_statement","expression_statement : expression SEMICOLON");
@@ -454,13 +515,13 @@ expression_statement : SEMICOLON{
 			$$->addChild($1); $$->addChild(symbolToParse($2));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($2->getEndLine());
-
 			} 
 			;
 	  
 variable : ID{
 		$$=setLeft("variable","variable : ID");
 		fprintf(logout,"variable : ID 	 \n");
+		lookForVariable($1,$1->getStartLine());
 		$$->addChild(symbolToParse($1));
 		$$->setStartLine($1->getStartLine());
 		$$->setEndLine($1->getEndLine());
@@ -468,6 +529,7 @@ variable : ID{
 	 	| ID LTHIRD expression RTHIRD{
 		$$=setLeft("variable","variable : ID LSQUARE expression RSQUARE");
 		fprintf(logout,"variable : ID LSQUARE expression RSQUARE  	 \n");
+		lookForVariable($1,$1->getStartLine());
 		$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild($3); $$->addChild(symbolToParse($4));
 		$$->setStartLine($1->getStartLine());
 		$$->setEndLine($4->getEndLine());
@@ -550,8 +612,6 @@ term :	unary_expression {
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
-
-
 			}
      		|  term MULOP unary_expression {
 			$$=setLeft("term","term : term MULOP unary_expression");
@@ -596,6 +656,7 @@ factor	: variable {
 			| ID LPAREN argument_list RPAREN {
 			$$=setLeft("factor","factor	: ID LPAREN argument_list RPAREN");
 			fprintf(logout,"factor	: ID LPAREN argument_list RPAREN  \n");
+			lookForVariable($1,$1->getStartLine());
 			$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild($3); $$->addChild(symbolToParse($4));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($4->getEndLine());
