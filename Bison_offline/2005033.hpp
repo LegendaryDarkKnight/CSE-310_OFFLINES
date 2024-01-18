@@ -468,4 +468,61 @@ public:
     }
 };
 
+class MyStack1
+{
+    SymbolInfo *head, *tail;
+    int count;
+
+public:
+    MyStack1()
+    {
+        head = tail = nullptr;
+        count = 0;
+    }
+    ~MyStack1()
+    {
+        cleanUp();
+    }
+    void push(SymbolInfo *s)
+    {
+        if (head == nullptr)
+        {
+            head = tail = s;
+            count++;
+            return;
+        }
+        tail->setNext1(s);
+        tail = tail->getNext1();
+        count++;
+    }
+    SymbolInfo *pop()
+    {
+        if (head == nullptr)
+            return nullptr;
+        SymbolInfo *temp = head;
+        head = head->getNext1();
+        count--;
+        return temp;
+    }
+    void cleanUp()
+    {
+        SymbolInfo *iter = head, *temp = nullptr;
+        while (iter != nullptr)
+        {
+            temp = iter;
+            iter = iter->getNext1();
+            delete temp;
+            temp = nullptr;
+        }
+        head = tail = nullptr;
+        count = 0;
+    }
+    bool isEmpty()
+    {
+        return head == nullptr;
+    }
+    int size(){
+        return count;
+    }
+};
 #endif

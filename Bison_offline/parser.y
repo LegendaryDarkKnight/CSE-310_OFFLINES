@@ -15,7 +15,9 @@ extern int err_count;
 extern int start_line;
 bool infunc = false;
 bool sayArray = false;
-MyStack stack1, stack2;
+MyStack1 stack1, stack2;
+bool stillValid = true;
+int validCount = 0;
 
 FILE *fp;
 FILE *logout;
@@ -31,6 +33,9 @@ void yyerror(char *s)
 {
 	fprintf(logout,"Error at line %d: %s\n",line_count,s);
 	infunc = false;	
+	sayArray = false;
+	stillValid = true;
+	validCount = 0;
 	stack1.cleanUp();
 	stack2.cleanUp();
 }
@@ -38,6 +43,7 @@ bool voidCheck(string type1, string name, int line){
 	if(type1=="VOID"){
 		fprintf(errorout,"Line# %d: Variable or field '%s' declared void\n",line,name.c_str());
 		err_count++;
+		stillValid = false;
 		return true;
 	}
 	return false;
@@ -45,12 +51,15 @@ bool voidCheck(string type1, string name, int line){
 FuncExtras *addExtraInFunc(string type, bool defined){
 	vector<Pair *> p;
 	SymbolInfo *s;
-	while(!stack2.isEmpty()){
+	stillValid = true;
+	while(!stack2.isEmpty() && validCount>0){
 		s = stack2.pop();
 		p.push_back(new Pair(s->getName(), s->getType()));
 		s = nullptr;
+		validCount--;
 	}
-
+	validCount = 0;
+	stack2.cleanUp();
 	return new FuncExtras(type,p,defined);
 }
 
@@ -67,14 +76,22 @@ ParseTree* symbolToParse(SymbolInfo *s){
 
 void insertParameters(){
 	if(infunc){
-		SymbolInfo *s;		
+		SymbolInfo *s;	
+		int valid = 0;	
+		stillValid = true;
 		while(!stack1.isEmpty()){
 			s = stack1.pop() ;
 			if(!table->Insert(s->getName(),s->getType())){	
 				fprintf(errorout,"Line# %d: Redefinition of parameter '%s'\n",s->getStartLine(),s->getName().c_str());
 				delete s;
+				break;
 			}
+			cout<<s->getName()<<endl;
+			valid++;
 		}
+		cout<<valid<<endl;
+		validCount = valid;
+		stack1.cleanUp();
 		infunc = false;
 	}
 }
@@ -170,7 +187,7 @@ ASSIGNOP LOGICOP RELOP ADDOP MULOP CONST_FLOAT NOT INCOP DECOP
 		delete $$;
 		$$ = nullptr;
 	}
-} <parseTree>
+} <parseTree> 
 %type <parseTree> start program unit var_declaration func_declaration func_definition type_specifier parameter_list compound_statement statements declaration_list statement expression expression_statement logic_expression rel_expression simple_expression term unary_expression factor variable argument_list arguments
 %left 
 %right
@@ -239,7 +256,7 @@ func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($6->getEndLine());	
 			stack1.cleanUp();
-			// stack2.cleanUp();
+			stack2.cleanUp();
 		}
 		| type_specifier ID LPAREN RPAREN SEMICOLON{
 			$$ = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON");
@@ -284,9 +301,10 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 			$$ = setLeft("parameter_list","parameter_list : parameter_list COMMA type_specifier ID");
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier ID\n");
 			temp = $4;
-			if(!voidCheck(type,temp->getName(),$4->getEndLine())){
+			if(!voidCheck(type,temp->getName(),$4->getEndLine()) && stillValid){
 				stack1.push(new SymbolInfo(temp->getName(), type));
 				stack2.push(new SymbolInfo(temp->getName(), type));
+				validCount++;
 			}			
 			$$->addChild($1); $$->addChild(symbolToParse($2));
 			$$->addChild($3); $$->addChild(symbolToParse($4));
@@ -296,9 +314,10 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 		| parameter_list COMMA type_specifier{
 			$$ = setLeft("parameter_list", "parameter_list : parameter_list COMMA type_specifier");
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier\n");
-			if(!voidCheck(type,"",$3->getStartLine())){
-				// stack1.push(new SymbolInfo("temp", type));
+			if(!voidCheck(type,"",$3->getStartLine()) && stillValid){
+				stack1.push(new SymbolInfo("temp", type));
 				stack2.push(new SymbolInfo("temp", type));
+				validCount++;
 			}
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
@@ -308,9 +327,10 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 			$$ = setLeft("parameter_list","parameter_list  : type_specifier ID");
 			fprintf(logout,"parameter_list  : type_specifier ID\n");
 			temp = $2;
-			if(!voidCheck(type,temp->getName(),$2->getEndLine())){
+			if(!voidCheck(type,temp->getName(),$2->getEndLine()) && stillValid){
 				stack1.push(new SymbolInfo(temp->getName(), type));
 				stack2.push(new SymbolInfo(temp->getName(), type));
+				validCount++;
 			}
 			$$->addChild($1); $$->addChild(symbolToParse($2));
 			$$->setStartLine($1->getStartLine());
@@ -320,8 +340,9 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 			$$ = setLeft("parameter_list","parameter_list  : type_specifier");
 			fprintf(logout,"parameter_list  : type_specifier\n");
 			if(!voidCheck(type,"",$1->getStartLine())){
-				// stack1.push(new SymbolInfo("temp", type));
+				stack1.push(new SymbolInfo("temp", type));
 				stack2.push(new SymbolInfo("temp", type));
+				validCount++;
 			}
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
