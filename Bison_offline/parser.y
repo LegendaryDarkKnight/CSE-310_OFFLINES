@@ -34,16 +34,23 @@ void yyerror(char *s)
 	stack1.cleanUp();
 	stack2.cleanUp();
 }
-
+bool voidCheck(string type1, string name, int line){
+	if(type1=="VOID"){
+		fprintf(errorout,"Line# %d: Variable or field '%s' declared void\n",line,name.c_str());
+		err_count++;
+		return true;
+	}
+	return false;
+}
 FuncExtras *addExtraInFunc(string type, bool defined){
 	vector<Pair *> p;
 	SymbolInfo *s;
-	// fprintf(checkerout,"%d",stack2.size());
 	while(!stack2.isEmpty()){
-		s = stack2.pop() ;
+		s = stack2.pop();
 		p.push_back(new Pair(s->getName(), s->getType()));
 		s = nullptr;
 	}
+
 	return new FuncExtras(type,p,defined);
 }
 
@@ -60,20 +67,46 @@ ParseTree* symbolToParse(SymbolInfo *s){
 
 void insertParameters(){
 	if(infunc){
-		SymbolInfo *s;
+		SymbolInfo *s;		
 		while(!stack1.isEmpty()){
 			s = stack1.pop() ;
-			table->Insert(s->getName(),s->getType());
-			delete s;
-			s = nullptr;
+			if(!table->Insert(s->getName(),s->getType())){	
+				fprintf(errorout,"Line# %d: Redefinition of parameter '%s'\n",s->getStartLine(),s->getName().c_str());
+				delete s;
+			}
 		}
 		infunc = false;
 	}
 }
 
+bool redefinitionCheck(string name, string type, int line){
+	temp = table->Lookup(name);
+	if(temp!= nullptr){
+		if(temp->getType()==type){
+		fprintf(errorout,"Line# %d: Redefinition of variable '%s'\n",line,name.c_str());
+		err_count++;
+		return true;
+		}
+	}
+	return false;
+}
+bool redefinitionCheckFunc(string name, string type1, int line){
+	temp = table->Lookup(name);
+	if(temp!= nullptr){
+		if(temp->getExtra()->getReturnType()==type1){
+		fprintf(errorout,"Line# %d: Redefinition of Function '%s'\n",line,name.c_str());
+		err_count++;
+		return true;
+		}
+	}
+	return false;
+}
+
 // error checking functions
 void conflictingType(SymbolInfo *s, int line, bool isfunc, string type1, bool define){ // boolean is func is used so that if we get ID type we may use 
-	// fprintf(checkerout,"%s %d %d\n",s->getType().c_str(),s->isFunc(),isfunc);
+	if(!isfunc and voidCheck(type1,s->getName(),line)){		
+		return;
+	}
 	if(s->isFunc() and !isfunc){
 		if(!table->Insert(s->getName(),type)){
 			fprintf(errorout,"Line# %d: '%s' redeclared as different kind of symbol\n",line,s->getName().c_str());
@@ -81,7 +114,6 @@ void conflictingType(SymbolInfo *s, int line, bool isfunc, string type1, bool de
 		}
 	}
 	else if(!s->isFunc() and isfunc){
-		// fprintf(checkerout,"%s %d %d\n",s->getType().c_str(),s->isFunc(),isfunc);
 		if(!table->Insert(s->getName(),"FUNCTION",addExtraInFunc(type1,define))){
 			fprintf(errorout,"Line# %d: '%s' redeclared as different kind of symbol\n",line,s->getName().c_str());
 			err_count++;
@@ -89,8 +121,8 @@ void conflictingType(SymbolInfo *s, int line, bool isfunc, string type1, bool de
 	}
 	else if(s->isFunc()){
 		if(s->getExtra()->getDefinition()||s->getExtra()->getReturnType()!= type1 ||s->getExtra()->getNumber()!=stack2.size()){
-			fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
-			err_count++;
+				fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
+				err_count++;		
 		}
 		else if(!table->Insert(s->getName(),"FUNCTION",addExtraInFunc(type1,define)) && !define){
 			fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
@@ -103,12 +135,12 @@ void conflictingType(SymbolInfo *s, int line, bool isfunc, string type1, bool de
 			err_count++;
 		}
 	}
-	else if(sayArray && table->Insert(s->getName(),type)){
+	else if(sayArray && table->Insert(s->getName(),type) && !redefinitionCheck(s->getName(),type1,line)){
 		temp = table->Lookup(s->getName());
 		temp->setArray();
 		sayArray = false;
 	}
-	else if(!table->Insert(s->getName(),type)){
+	else if(!table->Insert(s->getName(),type) && !redefinitionCheck(s->getName(),type1,line)){
 		fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
 		err_count++;
 	}
@@ -120,34 +152,6 @@ void lookForVariable(SymbolInfo *s, int line){
 		err_count++;
 	}
 }
-void leftRightTypeChecking(){
-
-}
-
-void indexIsInt(){
-
-}
-
-void intModint(SymbolInfo *op){
-
-}
-
-void functionArgumentCheck(){
-
-}
-
-void voidFuncCheck(){
-
-}
-
-void uniquenessCheck(){
-
-}
-
-void arrayIndexCheck(){
-
-}
-
 
 %}
 
@@ -235,6 +239,7 @@ func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($6->getEndLine());	
 			stack1.cleanUp();
+			// stack2.cleanUp();
 		}
 		| type_specifier ID LPAREN RPAREN SEMICOLON{
 			$$ = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON");
@@ -279,8 +284,10 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 			$$ = setLeft("parameter_list","parameter_list : parameter_list COMMA type_specifier ID");
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier ID\n");
 			temp = $4;
-			stack1.push(new SymbolInfo(temp->getName(), type));
-			stack2.push(new SymbolInfo(temp->getName(), type));
+			if(!voidCheck(type,temp->getName(),$4->getEndLine())){
+				stack1.push(new SymbolInfo(temp->getName(), type));
+				stack2.push(new SymbolInfo(temp->getName(), type));
+			}			
 			$$->addChild($1); $$->addChild(symbolToParse($2));
 			$$->addChild($3); $$->addChild(symbolToParse($4));
 			$$->setStartLine($1->getStartLine());	
@@ -289,8 +296,10 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 		| parameter_list COMMA type_specifier{
 			$$ = setLeft("parameter_list", "parameter_list : parameter_list COMMA type_specifier");
 			fprintf(logout,"parameter_list  : parameter_list COMMA type_specifier\n");
-			stack1.push(new SymbolInfo("", type));
-			stack2.push(new SymbolInfo("", type));
+			if(!voidCheck(type,"",$3->getStartLine())){
+				// stack1.push(new SymbolInfo("temp", type));
+				stack2.push(new SymbolInfo("temp", type));
+			}
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
@@ -299,8 +308,10 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 			$$ = setLeft("parameter_list","parameter_list  : type_specifier ID");
 			fprintf(logout,"parameter_list  : type_specifier ID\n");
 			temp = $2;
-			stack1.push(new SymbolInfo(temp->getName(), type));
-			stack2.push(new SymbolInfo(temp->getName(), type));
+			if(!voidCheck(type,temp->getName(),$2->getEndLine())){
+				stack1.push(new SymbolInfo(temp->getName(), type));
+				stack2.push(new SymbolInfo(temp->getName(), type));
+			}
 			$$->addChild($1); $$->addChild(symbolToParse($2));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($2->getEndLine());
@@ -308,6 +319,10 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 		| type_specifier{
 			$$ = setLeft("parameter_list","parameter_list  : type_specifier");
 			fprintf(logout,"parameter_list  : type_specifier\n");
+			if(!voidCheck(type,"",$1->getStartLine())){
+				// stack1.push(new SymbolInfo("temp", type));
+				stack2.push(new SymbolInfo("temp", type));
+			}
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());

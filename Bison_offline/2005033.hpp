@@ -101,6 +101,7 @@ class SymbolInfo
     string name;
     string type;
     SymbolInfo *next;
+    SymbolInfo *next1;
     FuncExtras *extra;
     int line;
     bool array1 = false;    
@@ -114,6 +115,8 @@ public:
     string getType() { return type; }
     void setNext(SymbolInfo *ptr) { next = ptr; }
     SymbolInfo *getNext() { return next; }
+    void setNext1(SymbolInfo *ptr) { next1 = ptr; }
+    SymbolInfo *getNext1() { return next1; }
     bool isFunc(){
         return extra!=nullptr;
     }
@@ -410,12 +413,13 @@ public:
 class MyStack
 {
     SymbolInfo *head;
-    int count = 0;
+    int count;
 
 public:
     MyStack()
     {
         head = nullptr;
+        count = 0;
     }
     ~MyStack()
     {
@@ -429,7 +433,7 @@ public:
             count++;
             return;
         }
-        s->setNext(head);
+        s->setNext1(head);
         count++;
         head = s;
     }
@@ -438,7 +442,7 @@ public:
         if (head == nullptr)
             return nullptr;
         SymbolInfo *temp = head;
-        head = head->getNext();
+        head = head->getNext1();
         count--;
         return temp;
     }
@@ -448,7 +452,7 @@ public:
         while (iter != nullptr)
         {
             temp = iter;
-            iter = iter->getNext();
+            iter = iter->getNext1();
             delete temp;
             temp = nullptr;
         }
