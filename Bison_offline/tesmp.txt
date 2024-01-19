@@ -1,23 +1,9 @@
-void functionChecker(SymbolInfo *s, vector<string> &v){
-	if(!s->isFunc()){
-		fprintf(errorout,"Line %d: '%s' is not a function\n", s->getStartLine(), s->getName().c_str());
+bool checkVoidInExpression(string &testType, int line){
+	if(testType == "VOID"){
+		fprintf(errorout,"Line# %d  Void cannot be used in expression\n", line);
 		err_count++;
+		testType = "INT";
+        return true;
 	}
-    else if(v.size()<s->getExtra()->getNumber()){
-        fprintf(errorout,"Line %d: Too few arguments to function '%s'\n", s->getStartLine(), s->getName().c_str());
-		err_count++;
-    }
-    else if(v.size() > s->getExtra()->getNumber()){
-        fprintf(errorout,"Line %d: Too many arguments to function '%s'\n", s->getStartLine(), s->getName().c_str());
-		err_count++;
-    }
-    else {
-        vector<Pair *> temp = s->getExtra()->getParameterList();
-        for(int i=0; i<v.size(); i++){
-            if(v[i]!=temp[i]->getType()){
-                fprintf(errorout,"Line# %d: Type mismatch for argument %d of '%s'", s->getStartLine(), i+1, s->getName().c_str());
-            }
-        }
-        v.clear();
-    }
+    return false;
 }

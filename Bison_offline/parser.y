@@ -12,14 +12,15 @@ int yylex(void);
 extern FILE *yyin;
 extern int line_count;
 extern int err_count;
-extern int start_line;
+extern char *yytext;
 bool infunc = false;
 bool sayArray = false;
 MyStack1 stack1, stack2;
 bool stillValid = true;
 int validCount = 0;
+bool voidFound = false;
 vector<string> typeList;
-
+int value = 1;
 FILE *fp;
 FILE *logout;
 FILE *errorout;
@@ -34,7 +35,6 @@ void yyerror(char *s)
 {
 	fprintf(logout,"Error at line %d: %s\n",line_count,s);
 	infunc = false;	
-	sayArray = false;
 	stillValid = true;
 	validCount = 0;
 	stack1.cleanUp();
@@ -85,13 +85,14 @@ void insertParameters(){
 			s = stack1.pop() ;
 			if(!table->Insert(s->getName(),s->getType())){	
 				fprintf(errorout,"Line# %d: Redefinition of parameter '%s'\n",s->getStartLine(),s->getName().c_str());
+				err_count++;
 				delete s;
 				break;
 			}
-			cout<<s->getName()<<endl;
+			// cout<<s->getName()<<endl;
 			valid++;
 		}
-		cout<<valid<<endl;
+		// cout<<valid<<endl;
 		validCount = valid;
 		stack1.cleanUp();
 		infunc = false;
@@ -100,13 +101,13 @@ void insertParameters(){
 
 bool redefinitionCheck(string name, string type, int line){
 	temp = table->Lookup(name);
-	// if(temp!= nullptr){
-	// 	if(temp->getType()==type){
-	// 	fprintf(errorout,"Line# %d: Redefinition of variable '%s'\n",line,name.c_str());
-	// 	err_count++;
-	// 	return true;
-	// 	}
-	// }
+	if(temp!= nullptr){
+		if(temp->getType()==type){
+		fprintf(errorout,"Line# %d: Redeclaration of variable '%s'\n",line,name.c_str());
+		err_count++;
+		return true;
+		}
+	}
 	return false;
 }
 bool redefinitionCheckFunc(string name, string type1, int line){
@@ -123,6 +124,10 @@ bool redefinitionCheckFunc(string name, string type1, int line){
 
 // error checking functions
 void conflictingType(SymbolInfo *s, int line, bool isfunc, string type1, bool define){ // boolean is func is used so that if we get ID type we may use 
+	// fprintf(checkerout,"%d %s %d\n", line_count, s->getName().c_str(),define); // define will be also used as
+	bool  reclare ;
+	if(!(s->isFunc() or isfunc))
+		reclare = redefinitionCheck(s->getName(),type1,line);
 	if(!isfunc and voidCheck(type1,s->getName(),line)){		
 		return;
 	}
@@ -154,43 +159,48 @@ void conflictingType(SymbolInfo *s, int line, bool isfunc, string type1, bool de
 			err_count++;
 		}
 	}
-	else if(sayArray && table->Insert(s->getName(),type) && !redefinitionCheck(s->getName(),type1,line)){
+	else if(!reclare && define && table->Insert(s->getName(),type) ){
 		temp = table->Lookup(s->getName());
 		temp->setArray();
-		sayArray = false;
 	}
-	else if(!table->Insert(s->getName(),type) && !redefinitionCheck(s->getName(),type1,line)){
+	else if(!reclare && !table->Insert(s->getName(),type) ){
 		fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
 		err_count++;
 	}
 	
 }
-void lookForVariable(SymbolInfo *s, int line){
+void lookForVariable(SymbolInfo *s, int line, bool func){
 	if(table->Lookup(s->getName())==nullptr){
-		fprintf(errorout,"Line# %d: Undeclared variable '%s'\n",line,s->getName().c_str());
+		string s1;
+		if(func) s1 = "function";
+		else s1 = "variable";
+		fprintf(errorout,"Line# %d: Undeclared %s '%s'\n",line,s1.c_str(),s->getName().c_str());
 		err_count++;
 	}
 }
-void checkVoidInExpression(ParseTree *p){
-
+bool checkVoidInExpression(string testType, int line){
+	if(testType == "VOID"){
+		fprintf(errorout,"Line# %d: Void cannot be used in expression\n", line);
+		err_count++;
+		return true;
+	}
+	return false;
 }
-void balanceAssign(){
 
-}
 void functionChecker(SymbolInfo *s, vector<string> &v){
-	cout<<s->getType()<<endl;
+	// cout<<s->getType()<<endl;
 	if(!s->isFunc() ){
 		if(s->getType() != "ID"){
-		fprintf(errorout,"Line %d: '%s' is not a function\n", s->getStartLine(), s->getName().c_str());
+		fprintf(errorout,"Line# %d: '%s' is not a function\n", s->getStartLine(), s->getName().c_str());
 		err_count++;
 		}
 	}
     else if(v.size()<s->getExtra()->getNumber()){
-        fprintf(errorout,"Line %d: Too few arguments to function '%s'\n", s->getStartLine(), s->getName().c_str());
+        fprintf(errorout,"Line# %d: Too few arguments to function '%s'\n", s->getStartLine(), s->getName().c_str());
 		err_count++;
     }
     else if(v.size() > s->getExtra()->getNumber()){
-        fprintf(errorout,"Line %d: Too many arguments to function '%s'\n", s->getStartLine(), s->getName().c_str());
+        fprintf(errorout,"Line# %d: Too many arguments to function '%s'\n", s->getStartLine(), s->getName().c_str());
 		err_count++;
     }
     else {
@@ -204,6 +214,10 @@ void functionChecker(SymbolInfo *s, vector<string> &v){
 
     }
 	v.clear();
+}
+
+string typeVerifier(){
+
 }
 %}
 
@@ -284,8 +298,6 @@ func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
 			$$ = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON");
 			fprintf(logout,"func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON \n");
 			conflictingType($2,$1->getStartLine(),true,$1->getType(),false);
-			// temp = $2;
-			// table->Insert(temp->getName(),"FUNCTION", addExtraInFunc($1->getType(),false));
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild($4); $$->addChild(symbolToParse($5)); $$->addChild(symbolToParse($6));
 			$$->setStartLine($1->getStartLine());
@@ -297,8 +309,6 @@ func_declaration : type_specifier ID LPAREN parameter_list RPAREN SEMICOLON{
 			$$ = setLeft("func_declaration","func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON");
 			fprintf(logout,"func_declaration : type_specifier ID LPAREN RPAREN SEMICOLON \n");
 			conflictingType($2,$1->getStartLine(),true,$1->getType(),false);
-			// temp = $2;
-			// table->Insert(temp->getName(),"FUNCTION",addExtraInFunc($1->getType(),false));
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild(symbolToParse($4)); $$->addChild(symbolToParse($5));
 			$$->setStartLine($1->getStartLine());
@@ -310,8 +320,6 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN{infunc = true;}
 			$$ = setLeft("func_definition","func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement ");
 			fprintf(logout,"func_definition : type_specifier ID LPAREN parameter_list RPAREN compound_statement \n");
 			conflictingType($2,$1->getStartLine(),true,$1->getType(),true);
-			// temp = $2;
-			// table->Insert(temp->getName(),"FUNCTION",addExtraInFunc($1->getType(),true));
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild($4); $$->addChild(symbolToParse($5)); $$->addChild($7);
 			$$->setStartLine($1->getStartLine());
@@ -322,8 +330,6 @@ func_definition : type_specifier ID LPAREN parameter_list RPAREN{infunc = true;}
 			$$ = setLeft("func_definition","func_definition : type_specifier ID LPAREN RPAREN compound_statement ");
 			fprintf(logout,"func_definition : type_specifier ID LPAREN RPAREN compound_statement\n");
 			conflictingType($2,$1->getStartLine(),true,$1->getType(),true);
-			// temp = $2;
-			// table->Insert(temp->getName(),"FUNCTION",addExtraInFunc($1->getType(),true));
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild(symbolToParse($4)); $$->addChild($6);		
 			$$->setStartLine($1->getStartLine());
@@ -439,8 +445,6 @@ declaration_list : declaration_list COMMA ID{
 				$$=setLeft("declaration_list","declaration_list : declaration_list COMMA ID");
 				fprintf(logout,"declaration_list : declaration_list COMMA ID \n");
 				conflictingType($3,$1->getStartLine(),false,type,false);				
-				// temp = $3;
-				// table->Insert(temp->getName(),type);
 				$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 				$$->setStartLine($1->getStartLine());
 				$$->setEndLine($3->getEndLine());
@@ -448,9 +452,7 @@ declaration_list : declaration_list COMMA ID{
  		  		| declaration_list COMMA ID LTHIRD CONST_INT RTHIRD{
 				$$=setLeft("declaration_list","declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE");
 				fprintf(logout,"declaration_list :declaration_list COMMA ID LSQUARE CONST_INT RSQUARE \n");
-				conflictingType($3,$1->getStartLine(),false,type,false);				
-				// temp = $3;
-				// table->Insert(temp->getName(),type);
+				conflictingType($3,$1->getStartLine(),false,type,true);				
 				$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 				$$->addChild(symbolToParse($4)); $$->addChild(symbolToParse($5)); $$->addChild(symbolToParse($6)); 
 				$$->setStartLine($1->getStartLine());
@@ -460,20 +462,14 @@ declaration_list : declaration_list COMMA ID{
 				$$=setLeft("declaration_list", "declaration_list : ID");
 				fprintf(logout,"declaration_list : ID \n");
 				conflictingType($1,$1->getStartLine(),false,type,false);				
-				// temp = $1;
-				// table->Insert(temp->getName(),type);
 				$$->addChild(symbolToParse($1));
 				$$->setStartLine($1->getStartLine());
 				$$->setEndLine($1->getEndLine());
-	
 		  		}
  		  		| ID LTHIRD CONST_INT RTHIRD{
 				$$=setLeft("declaration_list","declaration_list : ID LSQUARE CONST_INT RSQUARE");
-				fprintf(logout,"declaration_list : ID LSQUARE CONST_INT RSQUARE \n");
-				sayArray = true;				
-				conflictingType($1,$1->getStartLine(),false,type,false);
-				// temp = $1;
-				// table->Insert(temp->getName(),type);
+				fprintf(logout,"declaration_list : ID LSQUARE CONST_INT RSQUARE \n");			
+				conflictingType($1,$1->getStartLine(),false,type,true);
 				$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3)); $$->addChild(symbolToParse($4));
 				$$->setStartLine($1->getStartLine());
 				$$->setEndLine($4->getEndLine());	
@@ -549,7 +545,7 @@ statement : var_declaration {
 	  		}
 	  		| WHILE LPAREN expression RPAREN statement{
 			$$=setLeft("statement","statement : WHILE LPAREN expression RPAREN statement");
-			fprintf(logout,"statement : WHILE LPAREN expression RPAREN statement  \n");
+			fprintf(logout,"statement : WHILE LPAREN expression RPAREN statement\n");
 			$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->addChild(symbolToParse($4)); $$->addChild($5); 
 			$$->setStartLine($1->getStartLine());
@@ -558,7 +554,7 @@ statement : var_declaration {
 	  		| PRINTLN LPAREN ID RPAREN SEMICOLON{
 			$$=setLeft("statement","statement : PRINTLN LPAREN ID RPAREN SEMICOLON");			
 			fprintf(logout,"statement : PRINTLN LPAREN ID RPAREN SEMICOLON  \n");
-			lookForVariable($3,$1->getStartLine());
+			lookForVariable($3,$1->getStartLine(), false);
 			$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3));
 			$$->addChild(symbolToParse($4)); $$->addChild(symbolToParse($5)); 
 			$$->setStartLine($1->getStartLine());
@@ -566,7 +562,7 @@ statement : var_declaration {
 	  		}
 	  		| RETURN expression SEMICOLON{
 			$$=setLeft("statement","statement : RETURN expression SEMICOLON");
-			fprintf(logout,"statement : RETURN expression SEMICOLON  \n");
+			fprintf(logout,"statement : RETURN expression SEMICOLON\n");
 			$$->addChild(symbolToParse($1)); $$->addChild($2); $$->addChild(symbolToParse($3));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
@@ -591,17 +587,18 @@ expression_statement : SEMICOLON{
 	  
 variable : ID{
 		$$=setLeft($1->getType(),"variable : ID");
-		fprintf(logout,"variable : ID 	 \n");
-		lookForVariable($1,$1->getStartLine());
+		fprintf(logout,"variable : ID\n");
+		lookForVariable($1,$1->getStartLine(), false);
 		$$->addChild(symbolToParse($1));
 		$$->setStartLine($1->getStartLine());
 		$$->setEndLine($1->getEndLine());
 		} 		
 	 	| ID LTHIRD expression RTHIRD{
 		$$=setLeft($1->getType(),"variable : ID LSQUARE expression RSQUARE");
-		fprintf(logout,"variable : ID LSQUARE expression RSQUARE \n");
-		lookForVariable($1,$1->getStartLine());
-		if($3->getType() != "INT") {fprintf(errorout,"Line# %d: Array subscript is not an integer\n", $3->getStartLine()); err_count++;}
+		fprintf(logout,"variable : ID LSQUARE expression RSQUARE\n");
+		lookForVariable($1,$1->getStartLine(), false);
+		if($1->getType()!="ID" && !$1->isArray()){fprintf(errorout,"Line# %d: '%s' is not an array\n", $1->getStartLine(),$1->getName().c_str()); err_count++;}
+		else if($3->getType() != "INT") {fprintf(errorout,"Line# %d: Array subscript is not an integer\n", $3->getStartLine()); err_count++;}
 		$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild($3); $$->addChild(symbolToParse($4));
 		$$->setStartLine($1->getStartLine());
 		$$->setEndLine($4->getEndLine());
@@ -610,14 +607,24 @@ variable : ID{
 	 
 expression : logic_expression{
 			$$=setLeft($1->getType(),"expression : logic_expression");
-			fprintf(logout,"expression 	: logic_expression\n");
+			fprintf(logout,"expression : logic_expression\n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
 	 		}
-	   		| variable ASSIGNOP logic_expression{
+	   		| variable ASSIGNOP logic_expression{ // what will be the type of $$
+			fprintf(logout,"expression : variable ASSIGNOP logic_expression \n");
+			if($1->getType() == "INT" and $3->getType() == "FLOAT"){
+				fprintf(errorout,"Line# %d: Warning: possible loss of data in assignment of FLOAT to INT\n", $1->getStartLine());
+				err_count++;
+			}
+			if(checkVoidInExpression($1->getType(),$1->getStartLine())){
+				$1->setType("INT");
+			}
+			if(checkVoidInExpression($3->getType(),$3->getStartLine())){
+				$3->setType("INT");
+			}
 			$$=setLeft($1->getType(),"expression : variable ASSIGNOP logic_expression");
-			fprintf(logout,"expression 	: variable ASSIGNOP logic_expression \n");
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
@@ -634,6 +641,13 @@ logic_expression : rel_expression 	{
 			 | rel_expression LOGICOP rel_expression {
 			$$=setLeft("INT","logic_expression : rel_expression LOGICOP rel_expression");
 			fprintf(logout,"logic_expression : rel_expression LOGICOP rel_expression\n");
+			if(checkVoidInExpression($1->getType(),$1->getStartLine())){
+				$1->setType("INT");
+			}
+			if(checkVoidInExpression($3->getType(),$3->getStartLine())){
+				$3->setType("INT");
+			}
+			
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
@@ -642,7 +656,7 @@ logic_expression : rel_expression 	{
 			
 rel_expression	: simple_expression {
 			$$=setLeft($1->getType(),"rel_expression : simple_expression");
-			fprintf(logout,"rel_expression	: simple_expression \n");
+			fprintf(logout,"rel_expression : simple_expression \n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
@@ -651,6 +665,13 @@ rel_expression	: simple_expression {
 			| simple_expression RELOP simple_expression	{
 			$$=setLeft("INT","rel_expression : simple_expression RELOP simple_expression");
 			fprintf(logout,"rel_expression	: simple_expression RELOP simple_expression	\n");
+			if(checkVoidInExpression($1->getType(),$1->getStartLine())){
+				$1->setType("INT");
+			}
+			if(checkVoidInExpression($3->getType(),$3->getStartLine())){
+				$3->setType("INT");
+			}
+			
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
@@ -665,8 +686,17 @@ simple_expression : term {
 
 			}	
 		  	| simple_expression ADDOP term {
-			$$=setLeft($1->getType(),"simple_expression :	simple_expression ADDOP term");
 			fprintf(logout,"simple_expression :	simple_expression ADDOP term \n");
+			if($1->getType() == "INT" and $3->getType() == "FLOAT"){
+				$$->setType("FLOAT");
+			}
+			if(checkVoidInExpression($1->getType(),$1->getStartLine())){
+				$1->setType("INT");
+			}
+			if(checkVoidInExpression($3->getType(),$3->getStartLine())){
+				$3->setType("INT");
+			}
+			$$=setLeft($1->getType(),"simple_expression : simple_expression ADDOP term");
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
@@ -674,7 +704,7 @@ simple_expression : term {
 		  ;
 					
 term :	unary_expression {
-			$$=setLeft($1->getType(),"term :	unary_expression");
+			$$=setLeft($1->getType(),"term : unary_expression");
 			fprintf(logout,"term :	unary_expression \n");
 			$$->addChild($1);
 			$$->setStartLine($1->getStartLine());
@@ -682,14 +712,38 @@ term :	unary_expression {
 			}
      		|  term MULOP unary_expression {
 			$$=setLeft($1->getType(),"term : term MULOP unary_expression");
+			if($1->getType() == "INT" and $3->getType() == "FLOAT"){
+				$$->setType("FLOAT");
+			}
+			if(($1->getType() == "FLOAT" or $3->getType() == "FLOAT") and ($2->getName()=="%")){
+				err_count++;
+				fprintf(errorout,"Line# %d: Operands of modulus must be integers\n", $1->getStartLine());
+				$$->setType("INT");
+			}
+			if(checkVoidInExpression($1->getType(),$1->getStartLine())){
+				$1->setType("INT");
+				$$->setType("INT");
+			}
+			if(checkVoidInExpression($3->getType(),$3->getStartLine())){
+				$3->setType("INT");
+			}
+			string s(yytext);
+			// cout<<s;
+			if(s=="0"){
+				err_count++;
+				fprintf(errorout,"Line# %d: Warning: division by zero i=0f=1Const=0\n", $1->getStartLine());
+			}
 			fprintf(logout,"term : term MULOP unary_expression \n");
 			$$->addChild($1); $$->addChild(symbolToParse($2)); $$->addChild($3);
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($3->getEndLine());
-	 }
-     ;
+	 		}
+     		;
 
 unary_expression : ADDOP unary_expression  {
+			if(checkVoidInExpression($2->getType(),$2->getStartLine())){
+				$2->setType("INT");
+			}
 			$$=setLeft($2->getType(),"unary_expression : ADDOP unary_expression");
 			fprintf(logout,"unary_expression : ADDOP unary_expression  \n");
 			$$->addChild(symbolToParse($1)); $$->addChild($2);
@@ -697,6 +751,9 @@ unary_expression : ADDOP unary_expression  {
 			$$->setEndLine($2->getEndLine());
 			}
 		 	| NOT unary_expression {
+			if(checkVoidInExpression($2->getType(),$2->getStartLine())){
+				$2->setType("INT");
+			}
 			$$=setLeft($2->getType(),"unary_expression : NOT unary_expression");
 			fprintf(logout,"unary_expression : NOT unary_expression \n");
 			$$->addChild(symbolToParse($1)); $$->addChild($2);
@@ -722,14 +779,14 @@ factor	: variable {
 			| ID LPAREN argument_list RPAREN {
 			string testType;
 			if($1->isFunc()){
-				testType = $1->getExtra()->getReturnType();
+				testType = $1->getExtra()->getReturnType();				
 			}
 			else{
 				testType = $1->getType();
 			}
 			$$=setLeft(testType,"factor	: ID LPAREN argument_list RPAREN");
 			fprintf(logout,"factor	: ID LPAREN argument_list RPAREN  \n");
-			lookForVariable($1,$1->getStartLine());
+			lookForVariable($1,$1->getStartLine(), true);
 			functionChecker($1,typeList);
 			$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild($3); $$->addChild(symbolToParse($4));
 			$$->setStartLine($1->getStartLine());
@@ -745,6 +802,7 @@ factor	: variable {
 			| CONST_INT {
 			$$=setLeft("INT","factor : CONST_INT");
 			fprintf(logout,"factor : CONST_INT\n");
+			value = atoi($1->getName().c_str());
 			$$->addChild(symbolToParse($1));
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
