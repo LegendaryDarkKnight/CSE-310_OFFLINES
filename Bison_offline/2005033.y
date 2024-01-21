@@ -34,6 +34,7 @@ string type;
 void yyerror(char *s)
 {
 	fprintf(logout,"Error at line %d: %s\n",line_count,s);
+	err_count++;
 	infunc = false;	
 	stillValid = true;
 	validCount = 0;
@@ -148,6 +149,17 @@ void conflictingType(SymbolInfo *s, int line, bool isfunc, string type1, bool de
 				fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
 				err_count++;		
 		}
+		else if(s->getExtra()){
+			vector<Pair *> v2 = s->getExtra()->getParameterList();
+			vector<string> v3 = stack2.getList();
+			for(int i=0; i<v3.size(); i++){
+				if(v2[i]->getType() != v3[i]){
+					fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
+					err_count++;
+					return;
+				}
+			}
+		}
 		else if(!table->Insert(s->getName(),"FUNCTION",addExtraInFunc(type1,define)) && !define){
 			fprintf(errorout,"Line# %d: Conflicting types for '%s'\n",line,s->getName().c_str());
 			err_count++;
@@ -216,16 +228,12 @@ void functionChecker(SymbolInfo *s, vector<string> &v){
 	v.clear();
 }
 
-string typeVerifier(){
-
-}
 %}
 
 %union {
 	SymbolInfo* symbolInfo;
 	ParseTree* parseTree;
 }
-
 %token <symbolInfo> IF ELSE FOR WHILE ID LPAREN RPAREN SEMICOLON LCURL RCURL COMMA INT FLOAT VOID LTHIRD CONST_INT RTHIRD PRINTLN RETURN
 ASSIGNOP LOGICOP RELOP ADDOP MULOP CONST_FLOAT NOT INCOP DECOP
 %nonassoc LOWER_THAN_ELSE
@@ -389,6 +397,17 @@ parameter_list  : parameter_list COMMA type_specifier ID{
 			$$->setStartLine($1->getStartLine());
 			$$->setEndLine($1->getEndLine());
 		}
+		| error {
+			$$ = setLeft("error","parameter_list  : error");
+			fprintf(logout,"parameter_list  : type_specifier\n");
+			stack1.push(new SymbolInfo("NN", type));
+			stack2.cleanUp();
+			validCount++;
+
+			$$->setStartLine(line_count);
+			$$->setEndLine(line_count);
+			yyclearin;
+		}
  		;
 
  		
@@ -473,7 +492,16 @@ declaration_list : declaration_list COMMA ID{
 				$$->addChild(symbolToParse($1)); $$->addChild(symbolToParse($2)); $$->addChild(symbolToParse($3)); $$->addChild(symbolToParse($4));
 				$$->setStartLine($1->getStartLine());
 				$$->setEndLine($4->getEndLine());	
-		  		}	
+		  		}
+				|  ID error{
+					$$=setLeft("error", "declaration_list : error");
+					fprintf(logout,"declaration_list : error\n");
+					conflictingType($1,$1->getStartLine(),false,type,false);				
+
+					$$->setStartLine(line_count);
+					$$->setEndLine(line_count);
+					yyclearin;
+				}	
  		  ;
  		  
 statements : statement{
@@ -729,7 +757,7 @@ term :	unary_expression {
 			}
 			string s(yytext);
 			// cout<<s;
-			if(s=="0"){
+			if(s[0] == '0' and stof(s)==0 and ($2->getName()=="%" || $2->getName()=="/")){
 				err_count++;
 				fprintf(errorout,"Line# %d: Warning: division by zero i=0f=1Const=0\n", $1->getStartLine());
 			}

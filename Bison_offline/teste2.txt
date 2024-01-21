@@ -34,7 +34,6 @@ string type;
 void yyerror(char *s)
 {
 	fprintf(logout,"Error at line %d: %s\n",line_count,s);
-	err_count++;
 	infunc = false;	
 	stillValid = true;
 	validCount = 0;

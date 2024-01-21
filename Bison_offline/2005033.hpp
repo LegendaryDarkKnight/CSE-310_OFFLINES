@@ -82,7 +82,7 @@ public:
         if(s==nullptr) return;
         for(int i=0; i<level; i++)
             fprintf(out, " ");
-        fprintf(out, "%s\t<Line: %d", s->line.c_str(), s->startLine);
+        fprintf(out, "%s \t<Line: %d", s->line.c_str(), s->startLine);
         if(s->type==""){
             fprintf(out, ">\n");
         }
@@ -475,7 +475,7 @@ class MyStack1
 {
     SymbolInfo *head, *tail;
     int count;
-
+    vector<string> vect;
 public:
     MyStack1()
     {
@@ -526,6 +526,16 @@ public:
     }
     int size(){
         return count;
+    }
+    vector<string> getList(){
+        vector<string> v;
+        SymbolInfo *iter = head;
+        while (iter != nullptr)
+        {
+            v.push_back(iter->getType());
+            iter = iter->getNext1();
+        }
+        return v;
     }
 };
 #endif

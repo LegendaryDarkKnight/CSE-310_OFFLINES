@@ -1,6 +1,7 @@
-int foo(){
+int f(int a, float b);
 
-}
-int foo(){
+int f(float a, int a);
+
+int f(int a, int b){
     
 }
