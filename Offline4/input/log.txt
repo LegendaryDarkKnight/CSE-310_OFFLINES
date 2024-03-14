@@ -1,0 +1,76 @@
+Line# 1: Token <INT> Lexeme int found
+type_specifier	: INT 
+Line# 1: Token <ID> Lexeme main found
+Line# 1: Token <LPAREN> Lexeme ( found
+Line# 1: Token <RPAREN> Lexeme ) found
+Line# 1: Token <LCURL> Lexeme { found
+Line# 2: Token <INT> Lexeme int found
+type_specifier	: INT 
+Line# 2: Token <ID> Lexeme b found
+Line# 2: Token <LSQUARE> Lexeme [ found
+Line# 2: Token <CONST_INT> Lexeme 9 found
+Line# 2: Token <RSQUARE> Lexeme ] found
+declaration_list : ID LSQUARE CONST_INT RSQUARE 
+Line# 2: Token <SEMICOLON> Lexeme ; found
+var_declaration : type_specifier declaration_list SEMICOLON  
+statement : var_declaration 
+statements : statement  
+Line# 3: Token <ID> Lexeme b found
+Line# 3: Token <LSQUARE> Lexeme [ found
+Line# 3: Token <CONST_INT> Lexeme 8 found
+factor	: CONST_INT   
+unary_expression : factor 
+term :	unary_expression 
+Line# 3: Token <RSQUARE> Lexeme ] found
+simple_expression : term 
+rel_expression	: simple_expression 
+logic_expression : rel_expression 	 
+expression 	: logic_expression	 
+variable : ID LSQUARE expression RSQUARE  	 
+Line# 3: Token <ASSIGNOP> Lexeme = found
+Line# 3: Token <CONST_INT> Lexeme 6 found
+factor	: CONST_INT   
+unary_expression : factor 
+term :	unary_expression 
+Line# 3: Token <SEMICOLON> Lexeme ; found
+simple_expression : term 
+rel_expression	: simple_expression 
+logic_expression : rel_expression 	 
+expression 	: variable ASSIGNOP logic_expression 		 
+expression_statement : expression SEMICOLON 		 
+statement : expression_statement  
+statements : statements statement  
+Line# 4: Token <RCURL> Lexeme } found
+compound_statement : LCURL statements RCURL  
+	ScopeTable# 2
+
+
+
+
+
+
+
+
+
+
+	11 --> <b, ARRAY, Width: 18, Offset: 18, IsParam: 0, Scope: 2, Base Type: INT>
+	ScopeTable# 1
+
+	2 --> <main, FUNCTION, Width: 0, Offset: -1, IsParam: 0, Scope: 1, RetType: INT>
+
+
+
+
+
+
+
+
+
+func_definition : type_specifier ID LPAREN RPAREN compound_statement
+unit : func_definition  
+program : unit 
+start : program 
+
+Total Lines: 6
+
+Total Errors: 0

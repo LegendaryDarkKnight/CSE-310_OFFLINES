@@ -15,3 +15,17 @@ test.cpp
 *.tab.h
 Offline 3
 lex.yy.c
+*.asm
+version2.y
+version3.y
+version4.y
+version5.y
+version6.y
+version7.y
+version8.y
+version9.y
+*.txt
+y.tab.c
+*.mp4
+*.c
+*.zip

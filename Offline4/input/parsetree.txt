@@ -1,0 +1,48 @@
+start : program 	<Line: 1-4>
+ program : unit 	<Line: 1-4>
+  unit : func_definition 	<Line: 1-4>
+   func_definition : type_specifier ID LPAREN RPAREN compound_statement 	<Line: 1-4>
+    type_specifier : INT 	<Line: 1-1>
+     INT : int	<Line: 1>
+    ID : main	<Line: 1>
+    LPAREN : (	<Line: 1>
+    RPAREN : )	<Line: 1>
+    compound_statement : LCURL statements RCURL 	<Line: 1-4>
+     LCURL : {	<Line: 1>
+     statements : statements statement 	<Line: 2-3>
+      statements : statement 	<Line: 2-2>
+       statement : var_declaration 	<Line: 2-2>
+        var_declaration : type_specifier declaration_list SEMICOLON 	<Line: 2-2>
+         type_specifier : INT 	<Line: 2-2>
+          INT : int	<Line: 2>
+         declaration_list : ID LSQUARE CONST_INT RSQUARE 	<Line: 2-2>
+          ID : b	<Line: 2>
+          LSQUARE : [	<Line: 2>
+          CONST_INT : 9	<Line: 2>
+          RSQUARE : ]	<Line: 2>
+         SEMICOLON : ;	<Line: 2>
+      statement : expression_statement 	<Line: 3-3>
+       expression_statement : expression SEMICOLON 	<Line: 3-3>
+        expression : variable ASSIGNOP logic_expression 	<Line: 3-3>
+         variable : ID LSQUARE expression RSQUARE 	<Line: 3-3>
+          ID : b	<Line: 3>
+          LSQUARE : [	<Line: 3>
+          expression : logic_expression 	<Line: 3-3>
+           logic_expression : rel_expression 	<Line: 3-3>
+            rel_expression : simple_expression 	<Line: 3-3>
+             simple_expression : term 	<Line: 3-3>
+              term : unary_expression 	<Line: 3-3>
+               unary_expression : factor 	<Line: 3-3>
+                factor : CONST_INT 	<Line: 3-3>
+                 CONST_INT : 8	<Line: 3>
+          RSQUARE : ]	<Line: 3>
+         ASSIGNOP : =	<Line: 3>
+         logic_expression : rel_expression 	<Line: 3-3>
+          rel_expression : simple_expression 	<Line: 3-3>
+           simple_expression : term 	<Line: 3-3>
+            term : unary_expression 	<Line: 3-3>
+             unary_expression : factor 	<Line: 3-3>
+              factor : CONST_INT 	<Line: 3-3>
+               CONST_INT : 6	<Line: 3>
+        SEMICOLON : ;	<Line: 3>
+     RCURL : }	<Line: 4>
