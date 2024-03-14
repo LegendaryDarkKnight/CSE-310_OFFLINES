@@ -8,26 +8,14 @@ main PROC
 	MOV DS, AX
 	PUSH BP
 	MOV BP, SP
-	SUB SP, 18
+	SUB SP, 2
+	SUB SP, 2
 L1:
-	MOV AX, 8       ; Line 3
-	PUSH AX
-	MOV AX, 6       ; Line 3
-	POP BX
-	PUSH AX
-	MOV AX, 2
-	MUL BX
-	MOV BX, AX
-	MOV AX, 18
-	SUB AX, BX
-	MOV BX, AX
-	POP AX
-	MOV SI, BX
-	NEG SI
-	MOV [BP+SI], AX
+	MOV AX, 5       ; Line 3
+	MOV [BP-2], AX
 L2:
 L3:
-	ADD SP, 18
+	ADD SP, 4
 	POP BP
 	MOV AX,4CH
 	INT 21H

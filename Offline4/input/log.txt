@@ -6,29 +6,19 @@ Line# 1: Token <RPAREN> Lexeme ) found
 Line# 1: Token <LCURL> Lexeme { found
 Line# 2: Token <INT> Lexeme int found
 type_specifier	: INT 
+Line# 2: Token <ID> Lexeme a found
+Line# 2: Token <COMMA> Lexeme , found
+declaration_list : ID 
 Line# 2: Token <ID> Lexeme b found
-Line# 2: Token <LSQUARE> Lexeme [ found
-Line# 2: Token <CONST_INT> Lexeme 9 found
-Line# 2: Token <RSQUARE> Lexeme ] found
-declaration_list : ID LSQUARE CONST_INT RSQUARE 
 Line# 2: Token <SEMICOLON> Lexeme ; found
+declaration_list : declaration_list COMMA ID  
 var_declaration : type_specifier declaration_list SEMICOLON  
 statement : var_declaration 
 statements : statement  
-Line# 3: Token <ID> Lexeme b found
-Line# 3: Token <LSQUARE> Lexeme [ found
-Line# 3: Token <CONST_INT> Lexeme 8 found
-factor	: CONST_INT   
-unary_expression : factor 
-term :	unary_expression 
-Line# 3: Token <RSQUARE> Lexeme ] found
-simple_expression : term 
-rel_expression	: simple_expression 
-logic_expression : rel_expression 	 
-expression 	: logic_expression	 
-variable : ID LSQUARE expression RSQUARE  	 
+Line# 3: Token <ID> Lexeme a found
 Line# 3: Token <ASSIGNOP> Lexeme = found
-Line# 3: Token <CONST_INT> Lexeme 6 found
+variable : ID 	 
+Line# 3: Token <CONST_INT> Lexeme 5 found
 factor	: CONST_INT   
 unary_expression : factor 
 term :	unary_expression 
@@ -52,8 +42,8 @@ compound_statement : LCURL statements RCURL
 
 
 
-
-	11 --> <b, ARRAY, Width: 18, Offset: 18, IsParam: 0, Scope: 2, Base Type: INT>
+	10 --> <a, INT, Width: 2, Offset: 2, IsParam: 0, Scope: 2>
+	11 --> <b, INT, Width: 2, Offset: 4, IsParam: 0, Scope: 2>
 	ScopeTable# 1
 
 	2 --> <main, FUNCTION, Width: 0, Offset: -1, IsParam: 0, Scope: 1, RetType: INT>

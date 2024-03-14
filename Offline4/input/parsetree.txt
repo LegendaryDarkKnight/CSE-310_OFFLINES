@@ -15,27 +15,17 @@ start : program 	<Line: 1-4>
         var_declaration : type_specifier declaration_list SEMICOLON 	<Line: 2-2>
          type_specifier : INT 	<Line: 2-2>
           INT : int	<Line: 2>
-         declaration_list : ID LSQUARE CONST_INT RSQUARE 	<Line: 2-2>
+         declaration_list : declaration_list COMMA ID 	<Line: 2-2>
+          declaration_list : ID 	<Line: 2-2>
+           ID : a	<Line: 2>
+          COMMA : ,	<Line: 2>
           ID : b	<Line: 2>
-          LSQUARE : [	<Line: 2>
-          CONST_INT : 9	<Line: 2>
-          RSQUARE : ]	<Line: 2>
          SEMICOLON : ;	<Line: 2>
       statement : expression_statement 	<Line: 3-3>
        expression_statement : expression SEMICOLON 	<Line: 3-3>
         expression : variable ASSIGNOP logic_expression 	<Line: 3-3>
-         variable : ID LSQUARE expression RSQUARE 	<Line: 3-3>
-          ID : b	<Line: 3>
-          LSQUARE : [	<Line: 3>
-          expression : logic_expression 	<Line: 3-3>
-           logic_expression : rel_expression 	<Line: 3-3>
-            rel_expression : simple_expression 	<Line: 3-3>
-             simple_expression : term 	<Line: 3-3>
-              term : unary_expression 	<Line: 3-3>
-               unary_expression : factor 	<Line: 3-3>
-                factor : CONST_INT 	<Line: 3-3>
-                 CONST_INT : 8	<Line: 3>
-          RSQUARE : ]	<Line: 3>
+         variable : ID 	<Line: 3-3>
+          ID : a	<Line: 3>
          ASSIGNOP : =	<Line: 3>
          logic_expression : rel_expression 	<Line: 3-3>
           rel_expression : simple_expression 	<Line: 3-3>
@@ -43,6 +33,6 @@ start : program 	<Line: 1-4>
             term : unary_expression 	<Line: 3-3>
              unary_expression : factor 	<Line: 3-3>
               factor : CONST_INT 	<Line: 3-3>
-               CONST_INT : 6	<Line: 3>
+               CONST_INT : 5	<Line: 3>
         SEMICOLON : ;	<Line: 3>
      RCURL : }	<Line: 4>

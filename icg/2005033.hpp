@@ -93,7 +93,6 @@ public:
         for(auto v: s->child){
             printTree(v,level+1,out);
         }
-
     }
     int getChildCount(){
         return child.size();

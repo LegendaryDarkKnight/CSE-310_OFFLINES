@@ -6,9 +6,25 @@
 main PROC
       MOV AX, 5656
       call print_output
+      call print_newline
+      MOV AX, 5656
+      call print_output
+      call print_newline
       MOV AH, 4CH
       INT 21H
 main ENDP
+print_newline PROC NEAR
+    PUSH BP
+    MOV BP, SP 
+    MOV BX, 0
+    MOV DL, 10
+    MOV AH, 2
+    INT 21H
+    MOV DL, 13
+    MOV AH, 2
+    INT 21H
+    POP BP
+    RET 0 
 print_output PROC NEAR
     PUSH BP
     MOV BP, SP 
