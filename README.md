@@ -12,6 +12,8 @@ From building a robust **symbol table** and crafting a **lexer** with Flex, to d
 
 This compilation of work reflects not only technical skills in C++, Flex, and Bison, but also an appreciation for the elegance and complexity of compiler design.
 
+Know more about the course from [outline](CSE-310_outline.pdf)
+
 ---
 
 ## 📦 Assignments Breakdown
