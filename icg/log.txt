@@ -1,2 +1,0 @@
-	ScopeTable# 1
-	2 --> <main,FUNCTION,INT>

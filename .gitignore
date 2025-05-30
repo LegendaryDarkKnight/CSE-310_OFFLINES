@@ -1,31 +1,15 @@
+# vscode folder
 .vscode
-*.exe
-*.o
-valgrind-out.txt
-2005033
-flex
-*.out
-test.l
-test.txt
-FLEX MATERIAL
-a.cpp
-yrs.txt*
-test.cpp
-*.o
-*.tab.h
-Offline 3
-lex.yy.c
-*.asm
-version2.y
-version3.y
-version4.y
-version5.y
-version6.y
-version7.y
-version8.y
-version9.y
-*.txt
-y.tab.c
-*.mp4
-*.c
-*.zip
+FLEX_MATERIAL
+
+#executables
+**/*.out
+**/*.exe
+
+#created cpp after compilation
+*/2005033.cpp
+
+**/y.o
+**/y.tab.c
+**/l.o
+**/lex.yy.c

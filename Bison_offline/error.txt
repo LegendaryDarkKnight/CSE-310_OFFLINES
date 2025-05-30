@@ -1,2 +1,0 @@
-Line# 3: Conflicting types for 'f'
-Line# 5: Conflicting types for 'f'
