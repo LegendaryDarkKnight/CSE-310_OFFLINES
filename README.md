@@ -1,21 +1,16 @@
-<h1 align="center">🧠 CSE 310: Compiler Design</h1>
+<h1 align="center">🧠 CSE 310: Compiler Sessional</h1> 
 <p align="center"><em>Bangladesh University of Engineering and Technology (BUET)</em></p>
-<p align="center"><code>Author: 2005033</code></p>
+<p align="center"><code>Author: Somik Dasgupta</code></p>
 
 ---
 
-<div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Flex_bison.svg" width="200" alt="Flex and Bison Logo" />
-</div>
+## 📘 Introduction
 
----
+This repository showcases my journey through the **CSE 310 Compiler Sessional** — a core course in the BUET CSE curriculum that dives deep into the inner workings of modern compilers. Through a series of four thoughtfully structured assignments, I explored the theoretical foundations and practical implementation of each major phase in the compilation pipeline.
 
-## 🚀 Overview
+From building a robust **symbol table** and crafting a **lexer** with Flex, to developing a complete **parser** with Bison and generating **intermediate assembly code**, each assignment brought me one step closer to understanding how high-level code is transformed into machine-readable instructions.
 
-Welcome to the **Compiler Universe!** 🌌  
-This repository is a journey through the four essential phases of compiler design. Each phase is implemented in a separate offline assignment as part of the **CSE 310** course at **BUET CSE**.
-
-> 🧬 From symbol tables to intermediate code, this repo builds a miniature compiler — step by step.
+This compilation of work reflects not only technical skills in C++, Flex, and Bison, but also an appreciation for the elegance and complexity of compiler design.
 
 ---
 
